@@ -29,21 +29,30 @@ interface UseVexaWebSocketReturn {
 const PING_INTERVAL = 25000; // 25 seconds
 const RECONNECT_DELAY = 3000; // 3 seconds
 
-// Cache the WebSocket URL to avoid repeated API calls
-let cachedWsUrl: string | null = null;
+// Cache the config to avoid repeated API calls
+let cachedConfig: { wsUrl: string; authToken: string | null } | null = null;
 
-async function fetchWsUrl(): Promise<string> {
-  if (cachedWsUrl) return cachedWsUrl;
+async function fetchConfig(): Promise<{ wsUrl: string; authToken: string | null }> {
+  if (cachedConfig) return cachedConfig;
 
   try {
     const response = await fetch("/api/config");
     const config = await response.json();
-    cachedWsUrl = config.wsUrl;
-    return config.wsUrl;
+    cachedConfig = { wsUrl: config.wsUrl, authToken: config.authToken };
+    return cachedConfig;
   } catch {
     // Fallback
-    return process.env.NEXT_PUBLIC_VEXA_WS_URL || "ws://localhost:18056/ws";
+    return {
+      wsUrl: process.env.NEXT_PUBLIC_VEXA_WS_URL || "ws://localhost:18056/ws",
+      authToken: null
+    };
   }
+}
+
+function buildWsUrl(baseUrl: string, authToken: string | null): string {
+  if (!authToken) return baseUrl;
+  const separator = baseUrl.includes("?") ? "&" : "?";
+  return `${baseUrl}${separator}token=${encodeURIComponent(authToken)}`;
 }
 
 export function useVexaWebSocket(
@@ -125,8 +134,9 @@ export function useVexaWebSocket(
     shouldReconnectRef.current = true;
     setConnectionState(true, false);
 
-    const wsUrl = await fetchWsUrl();
-    console.log("WebSocket: Connecting to", wsUrl);
+    const config = await fetchConfig();
+    const wsUrl = buildWsUrl(config.wsUrl, config.authToken);
+    console.log("WebSocket: Connecting to", wsUrl.replace(/token=([^&]+)/, "token=***"));
 
     try {
       const ws = new WebSocket(wsUrl);

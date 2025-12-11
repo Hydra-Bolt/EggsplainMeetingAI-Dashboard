@@ -161,17 +161,25 @@ export function useLiveTranscripts(
       setIsConnecting(true);
       setConnectionError(null);
 
-      // Fetch WebSocket URL from runtime config API
+      // Fetch WebSocket URL and auth token from runtime config API
       let wsUrl: string;
+      let authToken: string | null = null;
       try {
         const configResponse = await fetch("/api/config");
         const config = await configResponse.json();
         wsUrl = config.wsUrl;
+        authToken = config.authToken;
       } catch {
         // Fallback to build-time env var or default
         wsUrl = process.env.NEXT_PUBLIC_VEXA_WS_URL || "ws://localhost:18056/ws";
       }
-      console.log("[LiveTranscripts] Connecting to:", wsUrl);
+
+      // Append auth token as query parameter if available
+      if (authToken) {
+        const separator = wsUrl.includes("?") ? "&" : "?";
+        wsUrl = `${wsUrl}${separator}token=${encodeURIComponent(authToken)}`;
+      }
+      console.log("[LiveTranscripts] Connecting to:", wsUrl.replace(/token=([^&]+)/, "token=***"));
 
       try {
         const ws = new WebSocket(wsUrl);

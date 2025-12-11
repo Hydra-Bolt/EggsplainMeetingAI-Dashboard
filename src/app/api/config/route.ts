@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 
 /**
  * Public configuration endpoint that exposes runtime environment variables to the client.
  * This solves the Next.js limitation where NEXT_PUBLIC_* vars are only available at build time.
+ * Also returns the user's auth token for WebSocket authentication.
  */
 export async function GET() {
   const apiUrl = process.env.VEXA_API_URL || process.env.NEXT_PUBLIC_VEXA_API_URL || "http://localhost:18056";
@@ -17,8 +19,13 @@ export async function GET() {
     wsUrl = wsUrl.endsWith('/ws') ? wsUrl : `${wsUrl.replace(/\/$/, '')}/ws`;
   }
 
+  // Get user's auth token from cookie for WebSocket authentication
+  const cookieStore = await cookies();
+  const authToken = cookieStore.get("vexa-token")?.value;
+
   return NextResponse.json({
     wsUrl,
     apiUrl: process.env.NEXT_PUBLIC_VEXA_API_URL || apiUrl,
+    authToken: authToken || null,
   });
 }
