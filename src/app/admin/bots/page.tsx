@@ -84,13 +84,21 @@ export default function AdminBotsPage() {
     return () => clearInterval(interval);
   }, [fetchData]);
 
-  const handleStopBot = async (platform: Platform, nativeId: string) => {
+  const handleStopBot = useCallback(async (platform: Platform, nativeId: string) => {
     const key = `${platform}:${nativeId}`;
+
+    // Prevent duplicate requests
+    if (stoppingBots.has(key)) {
+      console.log(`Already stopping bot ${key}, ignoring duplicate request`);
+      return;
+    }
+
     setStoppingBots(prev => new Set(prev).add(key));
     try {
       await vexaAPI.stopBot(platform, nativeId);
       toast.success("Bot stopped successfully");
-      fetchData(true);
+      // Wait a bit before refreshing to let the backend update
+      setTimeout(() => fetchData(true), 500);
     } catch (error) {
       toast.error("Failed to stop bot", {
         description: (error as Error).message,
@@ -102,7 +110,7 @@ export default function AdminBotsPage() {
         return next;
       });
     }
-  };
+  }, [stoppingBots, fetchData]);
 
   const activeMeetings = meetings.filter(m =>
     m.status === "requested" || m.status === "joining" || m.status === "awaiting_admission" || m.status === "active"
