@@ -64,19 +64,15 @@ export const useMeetingsStore = create<MeetingsState>((set, get) => ({
   fetchMeeting: async (id: string) => {
     set({ isLoadingMeeting: true, error: null });
     try {
-      // First check if we already have it in the list
-      let { meetings } = get();
-      let meeting = meetings.find((m) => m.id.toString() === id);
+      // Always fetch fresh data from the API to ensure we have the latest meeting state
+      // This is important for newly created meetings where the cached data might be stale
+      const meetings = await vexaAPI.getMeetings();
+      meetings.sort((a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+      set({ meetings });
 
-      // If not found, fetch all meetings
-      if (!meeting) {
-        meetings = await vexaAPI.getMeetings();
-        meetings.sort((a, b) =>
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        );
-        set({ meetings });
-        meeting = meetings.find((m) => m.id.toString() === id);
-      }
+      const meeting = meetings.find((m) => m.id.toString() === id);
 
       if (meeting) {
         set({ currentMeeting: meeting, isLoadingMeeting: false });

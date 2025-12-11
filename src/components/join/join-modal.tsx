@@ -24,6 +24,7 @@ import { toast } from "sonner";
 import { vexaAPI } from "@/lib/api";
 import { useLiveStore } from "@/stores/live-store";
 import { useJoinModalStore } from "@/stores/join-modal-store";
+import { useMeetingsStore } from "@/stores/meetings-store";
 import type { Platform, CreateBotRequest } from "@/types/vexa";
 import { SUPPORTED_LANGUAGES } from "@/types/vexa";
 import { cn } from "@/lib/utils";
@@ -92,6 +93,7 @@ export function JoinModal() {
   const router = useRouter();
   const { isOpen, closeModal } = useJoinModalStore();
   const { setActiveMeeting } = useLiveStore();
+  const { setCurrentMeeting } = useMeetingsStore();
 
   const [meetingInput, setMeetingInput] = useState("");
   const [platform, setPlatform] = useState<Platform>("google_meet");
@@ -167,7 +169,9 @@ export function JoinModal() {
         description: "The transcription bot is connecting...",
       });
 
+      // Set meeting in both stores to ensure fresh data is used immediately
       setActiveMeeting(meeting);
+      setCurrentMeeting(meeting);
       closeModal();
 
       // Navigate to the meeting page
@@ -179,7 +183,7 @@ export function JoinModal() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [parsedInput, passcode, botName, language, setActiveMeeting, closeModal, router]);
+  }, [parsedInput, passcode, botName, language, setActiveMeeting, setCurrentMeeting, closeModal, router]);
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && closeModal()}>
