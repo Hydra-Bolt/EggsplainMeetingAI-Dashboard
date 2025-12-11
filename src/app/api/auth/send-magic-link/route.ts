@@ -2,39 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { sendMagicLinkEmail } from "@/lib/email";
 import { getRegistrationConfig, validateEmailForRegistration } from "@/lib/registration";
+import { findUserByEmail, createUser, createUserToken } from "@/lib/vexa-admin-api";
+import { cookies } from "next/headers";
 
 const JWT_SECRET = process.env.JWT_SECRET || process.env.VEXA_ADMIN_API_KEY || "default-secret-change-me";
 const MAGIC_LINK_EXPIRY = "15m"; // 15 minutes
 
 /**
- * Validate server configuration before processing request
+ * Check if SMTP is configured
  */
-function validateConfiguration(): { valid: boolean; error?: string; code?: string } {
-  // Check SMTP configuration
+function isSmtpConfigured(): boolean {
   const smtpHost = process.env.SMTP_HOST;
   const smtpUser = process.env.SMTP_USER;
   const smtpPass = process.env.SMTP_PASS;
-
-  if (!smtpHost || !smtpUser || !smtpPass) {
-    return {
-      valid: false,
-      error: "Email service not configured. Please contact the administrator.",
-      code: "SMTP_NOT_CONFIGURED",
-    };
-  }
-
-  // Check Admin API configuration
-  const adminApiKey = process.env.VEXA_ADMIN_API_KEY;
-
-  if (!adminApiKey || adminApiKey === "your_admin_api_key_here") {
-    return {
-      valid: false,
-      error: "Authentication service not configured. Please contact the administrator.",
-      code: "ADMIN_API_NOT_CONFIGURED",
-    };
-  }
-
-  return { valid: true };
+  return !!(smtpHost && smtpUser && smtpPass);
 }
 
 /**
@@ -88,14 +69,98 @@ async function checkUserExists(email: string): Promise<{ exists: boolean; error?
 }
 
 /**
+ * Direct login - authenticate user without email verification
+ * Used when SMTP is not configured
+ */
+async function handleDirectLogin(email: string): Promise<NextResponse> {
+  // Find or create user
+  const findResult = await findUserByEmail(email);
+
+  let user;
+  let isNewUser = false;
+
+  if (findResult.success && findResult.data) {
+    user = findResult.data;
+  } else if (findResult.error?.code === "NOT_FOUND") {
+    // Check registration restrictions
+    const config = getRegistrationConfig();
+    const validationError = validateEmailForRegistration(email, false, config);
+
+    if (validationError) {
+      return NextResponse.json(
+        { error: validationError },
+        { status: 403 }
+      );
+    }
+
+    // Create new user
+    const createResult = await createUser({ email });
+
+    if (!createResult.success || !createResult.data) {
+      return NextResponse.json(
+        { error: createResult.error?.message || "Failed to create user" },
+        { status: 500 }
+      );
+    }
+
+    user = createResult.data;
+    isNewUser = true;
+  } else if (findResult.error) {
+    return NextResponse.json(
+      { error: findResult.error.message, code: findResult.error.code },
+      { status: 503 }
+    );
+  }
+
+  // Create API token
+  const tokenResult = await createUserToken(user!.id);
+
+  if (!tokenResult.success || !tokenResult.data) {
+    return NextResponse.json(
+      { error: tokenResult.error?.message || "Failed to create session" },
+      { status: 500 }
+    );
+  }
+
+  const apiToken = tokenResult.data.token;
+
+  // Set cookie
+  const cookieStore = await cookies();
+  cookieStore.set("vexa-token", apiToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 60 * 60 * 24 * 30, // 30 days
+    path: "/",
+  });
+
+  // Return direct login response
+  return NextResponse.json({
+    success: true,
+    mode: "direct",
+    isNewUser,
+    user: {
+      id: user!.id,
+      email: user!.email,
+      name: user!.name,
+      max_concurrent_bots: user!.max_concurrent_bots,
+      created_at: user!.created_at,
+    },
+    token: apiToken,
+  });
+}
+
+/**
  * Send magic link endpoint - sends an email with verification link
+ * OR directly authenticates if SMTP is not configured
  */
 export async function POST(request: NextRequest) {
-  // Step 1: Validate server configuration first
-  const configCheck = validateConfiguration();
-  if (!configCheck.valid) {
+  // Check Admin API configuration first
+  const adminApiKey = process.env.VEXA_ADMIN_API_KEY;
+
+  if (!adminApiKey || adminApiKey === "your_admin_api_key_here") {
     return NextResponse.json(
-      { error: configCheck.error, code: configCheck.code },
+      { error: "Authentication service not configured. Please set VEXA_ADMIN_API_KEY.", code: "ADMIN_API_NOT_CONFIGURED" },
       { status: 503 }
     );
   }
@@ -119,7 +184,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Step 2: Check if user exists (also validates API connectivity)
+    // Check if SMTP is configured
+    const smtpEnabled = isSmtpConfigured();
+
+    if (!smtpEnabled) {
+      // Direct login mode - no email verification
+      console.log("SMTP not configured, using direct login mode for:", email);
+      return handleDirectLogin(email);
+    }
+
+    // Magic Link mode - send email verification
+    // Check if user exists (also validates API connectivity)
     const userCheck = await checkUserExists(email);
 
     if (userCheck.error) {
@@ -129,7 +204,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Step 3: Check registration restrictions before sending email
+    // Check registration restrictions before sending email
     const config = getRegistrationConfig();
     const validationError = validateEmailForRegistration(email, userCheck.exists, config);
 
@@ -140,21 +215,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Step 4: Generate JWT token with email
+    // Generate JWT token with email
     const token = jwt.sign(
       { email, type: "magic-link" },
       JWT_SECRET,
       { expiresIn: MAGIC_LINK_EXPIRY }
     );
 
-    // Step 5: Build magic link URL
+    // Build magic link URL
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL ||
                    (request.headers.get("origin") ||
                     `${request.headers.get("x-forwarded-proto") || "http"}://${request.headers.get("host")}`);
 
     const magicLink = `${baseUrl}/auth/verify?token=${encodeURIComponent(token)}`;
 
-    // Step 6: Send email
+    // Send email
     try {
       await sendMagicLinkEmail(email, magicLink);
     } catch (emailError) {
@@ -184,6 +259,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
+      mode: "magic-link",
       message: "Magic link sent to your email",
     });
   } catch (error) {

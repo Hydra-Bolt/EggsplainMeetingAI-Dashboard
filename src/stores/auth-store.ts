@@ -2,6 +2,15 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { VexaUser } from "@/types/vexa";
 
+interface LoginResult {
+  success: boolean;
+  error?: string;
+  mode?: "direct" | "magic-link";
+  user?: VexaUser;
+  token?: string;
+  isNewUser?: boolean;
+}
+
 interface AuthState {
   user: VexaUser | null;
   token: string | null;
@@ -9,7 +18,7 @@ interface AuthState {
   isAuthenticated: boolean;
 
   // Actions
-  sendMagicLink: (email: string) => Promise<{ success: boolean; error?: string }>;
+  sendMagicLink: (email: string) => Promise<LoginResult>;
   setAuth: (user: VexaUser, token: string) => void;
   logout: () => void;
   setUser: (user: VexaUser | null) => void;
@@ -28,7 +37,7 @@ export const useAuthStore = create<AuthState>()(
       isLoading: false,
       isAuthenticated: false,
 
-      sendMagicLink: async (email: string) => {
+      sendMagicLink: async (email: string): Promise<LoginResult> => {
         set({ isLoading: true });
         try {
           const response = await fetch("/api/auth/send-magic-link", {
@@ -39,13 +48,36 @@ export const useAuthStore = create<AuthState>()(
 
           const data = await response.json();
 
-          set({ isLoading: false });
-
           if (!response.ok) {
+            set({ isLoading: false });
             return { success: false, error: data.error || "Failed to send magic link" };
           }
 
-          return { success: true };
+          // Check if this is a direct login response
+          if (data.mode === "direct" && data.user && data.token) {
+            // Direct login - set auth immediately
+            set({
+              user: data.user,
+              token: data.token,
+              isAuthenticated: true,
+              isLoading: false,
+            });
+
+            return {
+              success: true,
+              mode: "direct",
+              user: data.user,
+              token: data.token,
+              isNewUser: data.isNewUser,
+            };
+          }
+
+          // Magic link mode - user needs to check email
+          set({ isLoading: false });
+          return {
+            success: true,
+            mode: "magic-link",
+          };
         } catch (error) {
           set({ isLoading: false });
           return { success: false, error: (error as Error).message };

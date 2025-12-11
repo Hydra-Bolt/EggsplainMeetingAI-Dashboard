@@ -14,8 +14,9 @@ type LoginState = "email" | "sent";
 
 interface HealthStatus {
   status: "ok" | "degraded" | "error";
+  authMode: "direct" | "magic-link";
   checks: {
-    smtp: { configured: boolean; error?: string };
+    smtp: { configured: boolean; optional?: boolean; error?: string };
     adminApi: { configured: boolean; reachable: boolean; error?: string };
     vexaApi: { configured: boolean; reachable: boolean; error?: string };
   };
@@ -46,8 +47,9 @@ export default function LoginPage() {
       } catch {
         setHealthStatus({
           status: "error",
+          authMode: "direct",
           checks: {
-            smtp: { configured: false, error: "Cannot reach server" },
+            smtp: { configured: false, optional: true, error: "Cannot reach server" },
             adminApi: { configured: false, reachable: false, error: "Cannot reach server" },
             vexaApi: { configured: false, reachable: false, error: "Cannot reach server" },
           },
@@ -72,8 +74,15 @@ export default function LoginPage() {
     const result = await sendMagicLink(email);
 
     if (result.success) {
-      setState("sent");
-      toast.success("Magic link sent! Check your email.");
+      if (result.mode === "direct") {
+        // Direct login mode - user is authenticated, redirect to dashboard
+        toast.success(result.isNewUser ? "Account created! Welcome to Vexa." : "Welcome back!");
+        router.push("/");
+      } else {
+        // Magic link mode - show "check your email" screen
+        setState("sent");
+        toast.success("Magic link sent! Check your email.");
+      }
     } else {
       toast.error(result.error || "Failed to send magic link");
     }
@@ -95,6 +104,7 @@ export default function LoginPage() {
 
   const isConfigError = healthStatus?.status === "error";
   const hasWarnings = healthStatus?.status === "degraded";
+  const isDirectMode = healthStatus?.authMode === "direct";
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted/30 p-4">
@@ -156,7 +166,9 @@ export default function LoginPage() {
               <CardHeader className="text-center">
                 <CardTitle className="text-xl">Welcome</CardTitle>
                 <CardDescription>
-                  Enter your email to receive a sign-in link
+                  {isDirectMode
+                    ? "Enter your email to sign in"
+                    : "Enter your email to receive a sign-in link"}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -191,10 +203,12 @@ export default function LoginPage() {
                     ) : isLoading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Sending link...
+                        {isDirectMode ? "Signing in..." : "Sending link..."}
                       </>
                     ) : isConfigError ? (
                       "Server Unavailable"
+                    ) : isDirectMode ? (
+                      "Sign In"
                     ) : (
                       "Send Magic Link"
                     )}

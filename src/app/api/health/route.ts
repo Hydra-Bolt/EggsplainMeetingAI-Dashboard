@@ -1,9 +1,53 @@
 import { NextResponse } from "next/server";
+import https from "https";
+
+// Force dynamic rendering to avoid Next.js fetch caching issues
+export const dynamic = "force-dynamic";
+
+// Helper function to make HTTP requests using native https module
+// This bypasses Next.js's patched fetch which has known issues
+function httpsRequest(
+  url: string,
+  options: { headers?: Record<string, string>; timeout?: number } = {}
+): Promise<{ ok: boolean; status: number; data: string }> {
+  return new Promise((resolve, reject) => {
+    const urlObj = new URL(url);
+    const req = https.request(
+      {
+        hostname: urlObj.hostname,
+        port: urlObj.port || 443,
+        path: urlObj.pathname + urlObj.search,
+        method: "GET",
+        headers: options.headers || {},
+        timeout: options.timeout || 5000,
+      },
+      (res) => {
+        let data = "";
+        res.on("data", (chunk) => (data += chunk));
+        res.on("end", () => {
+          resolve({
+            ok: res.statusCode !== undefined && res.statusCode >= 200 && res.statusCode < 300,
+            status: res.statusCode || 0,
+            data,
+          });
+        });
+      }
+    );
+
+    req.on("error", reject);
+    req.on("timeout", () => {
+      req.destroy();
+      reject(new Error("Request timeout"));
+    });
+    req.end();
+  });
+}
 
 interface HealthStatus {
   status: "ok" | "degraded" | "error";
+  authMode: "direct" | "magic-link";
   checks: {
-    smtp: { configured: boolean; error?: string };
+    smtp: { configured: boolean; optional: boolean; error?: string };
     adminApi: { configured: boolean; reachable: boolean; error?: string };
     vexaApi: { configured: boolean; reachable: boolean; error?: string };
   };
@@ -16,26 +60,27 @@ interface HealthStatus {
 export async function GET() {
   const status: HealthStatus = {
     status: "ok",
+    authMode: "direct", // Will be updated to "magic-link" if SMTP is configured
     checks: {
-      smtp: { configured: false },
+      smtp: { configured: false, optional: true },
       adminApi: { configured: false, reachable: false },
       vexaApi: { configured: false, reachable: false },
     },
     missingConfig: [],
   };
 
-  // Check SMTP configuration
+  // Check SMTP configuration (optional - enables magic link auth)
   const smtpHost = process.env.SMTP_HOST;
   const smtpUser = process.env.SMTP_USER;
   const smtpPass = process.env.SMTP_PASS;
 
   if (smtpHost && smtpUser && smtpPass) {
     status.checks.smtp.configured = true;
+    status.authMode = "magic-link";
   } else {
-    status.checks.smtp.error = "SMTP not configured";
-    if (!smtpHost) status.missingConfig.push("SMTP_HOST");
-    if (!smtpUser) status.missingConfig.push("SMTP_USER");
-    if (!smtpPass) status.missingConfig.push("SMTP_PASS");
+    // SMTP is optional - direct login mode will be used
+    status.checks.smtp.error = "SMTP not configured - using direct login mode";
+    // Don't add SMTP to missingConfig as it's optional
   }
 
   // Check Admin API configuration
@@ -48,9 +93,10 @@ export async function GET() {
     // Test Admin API reachability
     if (adminApiUrl) {
       try {
-        const response = await fetch(`${adminApiUrl}/admin/users?limit=1`, {
+        const url = `${adminApiUrl}/admin/users?limit=1`;
+        const response = await httpsRequest(url, {
           headers: { "X-Admin-API-Key": adminApiKey },
-          signal: AbortSignal.timeout(5000),
+          timeout: 10000,
         });
 
         if (response.ok || response.status === 401) {
@@ -63,7 +109,8 @@ export async function GET() {
           status.checks.adminApi.error = `API returned ${response.status}`;
         }
       } catch (error) {
-        status.checks.adminApi.error = `Cannot reach API: ${(error as Error).message}`;
+        const err = error as Error;
+        status.checks.adminApi.error = `Cannot reach API: ${err.message || "unknown error"}`;
       }
     }
   } else {
@@ -77,26 +124,17 @@ export async function GET() {
   if (vexaApiUrl) {
     status.checks.vexaApi.configured = true;
 
-    // Test Vexa API reachability
+    // Test Vexa API reachability using /docs endpoint (Vexa API has Swagger docs)
     try {
-      const response = await fetch(`${vexaApiUrl}/health`, {
-        signal: AbortSignal.timeout(5000),
-      });
-
-      status.checks.vexaApi.reachable = response.ok;
-      if (!response.ok) {
+      const response = await httpsRequest(`${vexaApiUrl}/docs`, { timeout: 5000 });
+      // Consider any non-5xx response as reachable (200, 301, 404 all mean the server is up)
+      status.checks.vexaApi.reachable = response.status < 500;
+      if (response.status >= 500) {
         status.checks.vexaApi.error = `API returned ${response.status}`;
       }
     } catch (error) {
-      // Try root endpoint as fallback
-      try {
-        const response = await fetch(vexaApiUrl, {
-          signal: AbortSignal.timeout(5000),
-        });
-        status.checks.vexaApi.reachable = response.ok || response.status < 500;
-      } catch {
-        status.checks.vexaApi.error = `Cannot reach API: ${(error as Error).message}`;
-      }
+      const err = error as Error;
+      status.checks.vexaApi.error = `Cannot reach API: ${err.message || "unknown error"}`;
     }
   } else {
     status.checks.vexaApi.error = "Vexa API URL not configured";
@@ -104,13 +142,15 @@ export async function GET() {
   }
 
   // Determine overall status
-  const hasSmtp = status.checks.smtp.configured;
+  // Only Admin API is required. SMTP is optional (enables magic-link, otherwise direct login).
   const hasAdminApi = status.checks.adminApi.configured && status.checks.adminApi.reachable;
   const hasVexaApi = status.checks.vexaApi.configured;
 
-  if (!hasSmtp || !hasAdminApi) {
+  if (!hasAdminApi) {
+    // Admin API is required for authentication
     status.status = "error";
   } else if (!hasVexaApi || !status.checks.vexaApi.reachable) {
+    // Vexa API is needed for full functionality but not login
     status.status = "degraded";
   }
 
