@@ -1,15 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/stores/auth-store";
 import { Loader2 } from "lucide-react";
 
 // Routes that don't require authentication
-const publicRoutes = ["/login"];
-
-// Routes that require admin privileges (optional - for future use)
-const adminRoutes = ["/admin"];
+const publicRoutes = ["/login", "/auth/verify"];
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -19,6 +16,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { isAuthenticated, isLoading, checkAuth } = useAuthStore();
+  const [shouldRedirect, setShouldRedirect] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -27,26 +25,26 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Check if current route is public
   const isPublicRoute = publicRoutes.some((route) => pathname.startsWith(route));
 
+  // Handle redirect in useEffect to avoid React render warning
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated && !isPublicRoute) {
+      setShouldRedirect(true);
+    }
+  }, [isLoading, isAuthenticated, isPublicRoute]);
+
+  useEffect(() => {
+    if (shouldRedirect) {
+      router.push("/login");
+    }
+  }, [shouldRedirect, router]);
+
   // If on a public route, just render children
   if (isPublicRoute) {
     return <>{children}</>;
   }
 
-  // If loading, show loading state
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  // If not authenticated and not on public route, redirect to login
-  if (!isAuthenticated) {
-    // Use useEffect to avoid render loop
-    if (typeof window !== "undefined") {
-      router.push("/login");
-    }
+  // If loading or need to redirect, show loading state
+  if (isLoading || !isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
