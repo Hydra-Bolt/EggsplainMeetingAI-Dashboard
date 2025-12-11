@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Mail, Loader2, Mic, CheckCircle, ArrowLeft } from "lucide-react";
+import { Mail, Loader2, Mic, CheckCircle, ArrowLeft, AlertTriangle, XCircle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,17 +12,54 @@ import { toast } from "sonner";
 
 type LoginState = "email" | "sent";
 
+interface HealthStatus {
+  status: "ok" | "degraded" | "error";
+  checks: {
+    smtp: { configured: boolean; error?: string };
+    adminApi: { configured: boolean; reachable: boolean; error?: string };
+    vexaApi: { configured: boolean; reachable: boolean; error?: string };
+  };
+  missingConfig: string[];
+}
+
 export default function LoginPage() {
   const router = useRouter();
   const { sendMagicLink, isLoading, isAuthenticated } = useAuthStore();
   const [email, setEmail] = useState("");
   const [state, setState] = useState<LoginState>("email");
+  const [healthStatus, setHealthStatus] = useState<HealthStatus | null>(null);
+  const [healthLoading, setHealthLoading] = useState(true);
 
   useEffect(() => {
     if (isAuthenticated) {
       router.push("/");
     }
   }, [isAuthenticated, router]);
+
+  // Check server health on mount
+  useEffect(() => {
+    const checkHealth = async () => {
+      try {
+        const response = await fetch("/api/health");
+        const data = await response.json();
+        setHealthStatus(data);
+      } catch {
+        setHealthStatus({
+          status: "error",
+          checks: {
+            smtp: { configured: false, error: "Cannot reach server" },
+            adminApi: { configured: false, reachable: false, error: "Cannot reach server" },
+            vexaApi: { configured: false, reachable: false, error: "Cannot reach server" },
+          },
+          missingConfig: [],
+        });
+      } finally {
+        setHealthLoading(false);
+      }
+    };
+
+    checkHealth();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,6 +93,9 @@ export default function LoginPage() {
     setState("email");
   };
 
+  const isConfigError = healthStatus?.status === "error";
+  const hasWarnings = healthStatus?.status === "degraded";
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted/30 p-4">
       <div className="w-full max-w-md">
@@ -69,6 +109,46 @@ export default function LoginPage() {
             <p className="text-sm text-muted-foreground">Meeting Transcription</p>
           </div>
         </div>
+
+        {/* Configuration Error Banner */}
+        {!healthLoading && isConfigError && (
+          <div className="mb-4 p-4 rounded-lg bg-destructive/10 border border-destructive/20">
+            <div className="flex items-start gap-3">
+              <XCircle className="h-5 w-5 text-destructive mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <h3 className="font-medium text-destructive">Server Configuration Error</h3>
+                <p className="text-sm text-muted-foreground mt-1">
+                  The server is not properly configured. Please contact the administrator.
+                </p>
+                {healthStatus?.missingConfig && healthStatus.missingConfig.length > 0 && (
+                  <div className="mt-2 text-xs text-muted-foreground">
+                    <span className="font-medium">Missing:</span> {healthStatus.missingConfig.join(", ")}
+                  </div>
+                )}
+                {healthStatus?.checks.adminApi.error && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {healthStatus.checks.adminApi.error}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Warning Banner */}
+        {!healthLoading && hasWarnings && (
+          <div className="mb-4 p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="h-5 w-5 text-yellow-600 dark:text-yellow-500 mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <h3 className="font-medium text-yellow-600 dark:text-yellow-500">Connection Warning</h3>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Some services may be unavailable. Login should still work.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         <Card className="border-0 shadow-xl">
           {state === "email" ? (
@@ -92,18 +172,29 @@ export default function LoginPage() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className="pl-10"
-                        disabled={isLoading}
+                        disabled={isLoading || isConfigError}
                         autoFocus
                       />
                     </div>
                   </div>
 
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? (
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={isLoading || healthLoading || isConfigError}
+                  >
+                    {healthLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Checking server...
+                      </>
+                    ) : isLoading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Sending link...
                       </>
+                    ) : isConfigError ? (
+                      "Server Unavailable"
                     ) : (
                       "Send Magic Link"
                     )}
