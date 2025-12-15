@@ -36,7 +36,23 @@ docker run -p 3000:3000 \
 
 ## Screenshots
 
-*Coming soon*
+### Dashboard
+![Dashboard](docs/screenshots/01-dashboard.png)
+
+### Join a Meeting
+![Join Meeting](docs/screenshots/02-join-meeting.png)
+
+### Live Transcription
+![Live Transcript](docs/screenshots/06-live-transcript.png)
+
+### Meetings List
+![Meetings List](docs/screenshots/07-meetings-list.png)
+
+### Admin - User Management
+![Admin Users](docs/screenshots/08-admin-users.png)
+
+### Admin - Bots Monitoring
+![Admin Bots](docs/screenshots/09-admin-bots.png)
 
 ## 🐳 Docker Deployment
 
