@@ -1,15 +1,20 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { formatDistanceToNow, format } from "date-fns";
-import { Clock, ChevronRight, Calendar, MessageSquare } from "lucide-react";
+import { Clock, ChevronRight, Calendar, MessageSquare, FileText, Pencil, Check, X } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import type { Meeting } from "@/types/vexa";
 import { getDetailedStatus } from "@/types/vexa";
 import { cn, parseUTCTimestamp } from "@/lib/utils";
+import { useMeetingsStore } from "@/stores/meetings-store";
+import { toast } from "sonner";
 
 interface MeetingCardProps {
   meeting: Meeting;
@@ -42,11 +47,17 @@ function TeamsIcon({ className }: { className?: string }) {
 
 export function MeetingCard({ meeting }: MeetingCardProps) {
   const statusConfig = getDetailedStatus(meeting.status, meeting.data);
+  const updateMeetingData = useMeetingsStore((state) => state.updateMeetingData);
   // Platform detection - check if it's Google Meet (not Teams)
   const isGoogleMeet = meeting.platform !== "teams";
   // Display title from API data (name or title field)
   const displayTitle = meeting.data?.name || meeting.data?.title;
   const isActive = meeting.status === "active";
+  
+  // Title editing state
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [editedTitle, setEditedTitle] = useState("");
+  const [isSavingTitle, setIsSavingTitle] = useState(false);
 
   const duration = meeting.start_time && meeting.end_time
     ? Math.round(
@@ -126,8 +137,68 @@ export function MeetingCard({ meeting }: MeetingCardProps) {
 
   const tooltipContent = getStatusTooltipContent();
 
+  // Handle title editing
+  const handleStartEdit = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setEditedTitle(displayTitle || "");
+    setIsEditingTitle(true);
+  };
+
+  const handleSaveTitle = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!editedTitle.trim()) {
+      setIsEditingTitle(false);
+      return;
+    }
+    setIsSavingTitle(true);
+    try {
+      await updateMeetingData(meeting.platform, meeting.platform_specific_id, {
+        name: editedTitle.trim(),
+      });
+      setIsEditingTitle(false);
+      toast.success("Title updated");
+    } catch (error) {
+      toast.error("Failed to update title");
+    } finally {
+      setIsSavingTitle(false);
+    }
+  };
+
+  const handleCancelEdit = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsEditingTitle(false);
+    setEditedTitle("");
+  };
+
+  const handleKeyDown = async (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && editedTitle.trim() && !isSavingTitle) {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsSavingTitle(true);
+      try {
+        await updateMeetingData(meeting.platform, meeting.platform_specific_id, {
+          name: editedTitle.trim(),
+        });
+        setIsEditingTitle(false);
+        toast.success("Title updated");
+      } catch (error) {
+        toast.error("Failed to update title");
+      } finally {
+        setIsSavingTitle(false);
+      }
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsEditingTitle(false);
+      setEditedTitle("");
+    }
+  };
+
   return (
-    <Link href={`/meetings/${meeting.id}`} className="block group">
+    <Link href={`/meetings/${meeting.id}`} className="block group" onClick={(e) => isEditingTitle && e.preventDefault()}>
       <Card className={cn(
         "relative overflow-hidden transition-all duration-300 ease-out",
         "border-0 shadow-sm hover:shadow-lg",
@@ -175,19 +246,62 @@ export function MeetingCard({ meeting }: MeetingCardProps) {
               {/* Header row */}
               <div className="flex items-center justify-between gap-2">
                 <div className="min-w-0 flex-1">
-                  <h3 className={cn(
-                    "font-semibold text-base truncate",
-                    "transition-colors duration-200",
-                    "group-hover:text-primary"
-                  )}>
-                    {displayTitle || `Meeting ${meeting.platform_specific_id}`}
-                  </h3>
+                  {isEditingTitle ? (
+                    <div className="flex items-center gap-2">
+                      <Input
+                        value={editedTitle}
+                        onChange={(e) => setEditedTitle(e.target.value)}
+                        className="text-base font-semibold h-8 flex-1"
+                        placeholder="Meeting title..."
+                        autoFocus
+                        disabled={isSavingTitle}
+                        onKeyDown={handleKeyDown}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8"
+                        onClick={handleSaveTitle}
+                        disabled={isSavingTitle}
+                      >
+                        <Check className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8"
+                        onClick={handleCancelEdit}
+                        disabled={isSavingTitle}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 group/title">
+                      <h3 className={cn(
+                        "font-semibold text-base truncate",
+                        "transition-colors duration-200",
+                        "group-hover:text-primary"
+                      )}>
+                        {displayTitle || meeting.platform_specific_id}
+                      </h3>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8 opacity-0 group-hover/title:opacity-100 transition-opacity"
+                        onClick={handleStartEdit}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
                   {meeting.data?.participants && meeting.data.participants.length > 0 ? (
                     <p className="text-xs text-muted-foreground truncate mt-0.5">
                       With {meeting.data.participants.slice(0, 3).join(", ")}
                       {meeting.data.participants.length > 3 && ` +${meeting.data.participants.length - 3}`}
                     </p>
-                  ) : (
+                  ) : displayTitle && !isEditingTitle && (
                     <p className="text-xs text-muted-foreground font-mono truncate mt-0.5">
                       {meeting.platform_specific_id}
                     </p>
@@ -253,6 +367,27 @@ export function MeetingCard({ meeting }: MeetingCardProps) {
                     <MessageSquare className="h-3.5 w-3.5 text-muted-foreground" />
                     <span className="text-muted-foreground">{formatDuration(duration)}</span>
                   </div>
+                )}
+
+                {meeting.data?.notes && meeting.data.notes.trim() && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center gap-1.5 text-muted-foreground cursor-help">
+                        <FileText className="h-3.5 w-3.5" />
+                        <span>Note</span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-xs">
+                      <div className="text-xs">
+                        <div className="font-medium mb-1">Note:</div>
+                        <div className="text-muted-foreground">
+                          {typeof meeting.data.notes === "string" && meeting.data.notes.length > 100
+                            ? `${meeting.data.notes.substring(0, 100)}...`
+                            : String(meeting.data.notes)}
+                        </div>
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
                 )}
               </div>
 
