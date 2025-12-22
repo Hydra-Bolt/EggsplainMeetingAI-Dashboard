@@ -17,6 +17,20 @@ function formatTimestamp(seconds: number): string {
   return `${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
 }
 
+function formatAbsoluteTimestamp(utcAbsoluteTime: string): string {
+  try {
+    // Parse the UTC time string and convert to user's local timezone
+    const date = new Date(utcAbsoluteTime);
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+  } catch (error) {
+    // Fallback to relative timestamp if absolute time is invalid
+    console.error("Error parsing absolute timestamp:", error);
+    return "00:00";
+  }
+}
+
 function getInitials(name: string | null | undefined): string {
   if (!name) return "??";
   return name
@@ -71,7 +85,9 @@ export function TranscriptSegment({
             {segment.speaker || "Unknown Speaker"}
           </span>
           <span className="text-xs text-muted-foreground">
-            {formatTimestamp(segment.start_time)}
+            {segment.absolute_start_time 
+              ? formatAbsoluteTimestamp(segment.absolute_start_time)
+              : formatTimestamp(segment.start_time)}
           </span>
         </div>
         <p className="text-sm leading-relaxed">

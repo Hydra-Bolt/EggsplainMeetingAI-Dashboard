@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { MeetingList } from "@/components/meetings/meeting-list";
 import { ErrorState } from "@/components/ui/error-state";
+import { MCPConfigButton } from "@/components/mcp/mcp-config-button";
 import { useMeetingsStore } from "@/stores/meetings-store";
 import { useJoinModalStore } from "@/stores/join-modal-store";
 
@@ -42,10 +43,13 @@ export default function DashboardPage() {
             Overview of your meeting transcriptions
           </p>
         </div>
-        <Button onClick={openJoinModal}>
-          <Plus className="mr-2 h-4 w-4" />
-          Join Meeting
-        </Button>
+        <div className="flex items-center gap-2">
+          <MCPConfigButton />
+          <Button onClick={openJoinModal}>
+            <Plus className="mr-2 h-4 w-4" />
+            Join Meeting
+          </Button>
+        </div>
       </div>
 
       {/* Stats */}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { format, formatDistanceToNow } from "date-fns";
@@ -54,7 +54,13 @@ import { toast } from "sonner";
 export default function UserDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const userId = params.id as string;
+  // Unwrap params if it's a Promise (Next.js 15+ compatibility)
+  // useParams() should return a synchronous object in client components,
+  // but React may serialize it as a Promise during DevTools inspection
+  const resolvedParams = (params && typeof params === 'object' && 'then' in params && typeof (params as any).then === 'function')
+    ? use(params as Promise<{ id: string }>)
+    : (params as { id: string });
+  const userId = resolvedParams.id as string;
 
   const {
     selectedUser,
