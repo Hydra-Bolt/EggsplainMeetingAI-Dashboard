@@ -269,9 +269,24 @@ export function useLiveTranscripts(
       };
 
       ws.onerror = (event) => {
-        console.error("[LiveTranscripts] WebSocket error:", event);
         if (!mountedRef.current) return;
-        setConnectionError("Connection error");
+        
+        // WebSocket error events don't provide much detail, but we can check the readyState
+        const readyState = ws.readyState;
+        const readyStateText = 
+          readyState === WebSocket.CONNECTING ? "CONNECTING" :
+          readyState === WebSocket.OPEN ? "OPEN" :
+          readyState === WebSocket.CLOSING ? "CLOSING" :
+          readyState === WebSocket.CLOSED ? "CLOSED" : "UNKNOWN";
+        
+        const errorDetails = {
+          readyState: readyStateText,
+          url: wsUrl.replace(/api_key=([^&]+)/, "api_key=***"),
+          timestamp: new Date().toISOString(),
+        };
+        
+        console.error("[LiveTranscripts] WebSocket error:", errorDetails, event);
+        setConnectionError(`Connection error (${readyStateText})`);
       };
 
       ws.onclose = (event) => {

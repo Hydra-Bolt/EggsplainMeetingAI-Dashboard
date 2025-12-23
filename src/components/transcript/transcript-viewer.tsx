@@ -440,27 +440,28 @@ export function TranscriptViewer({
 
   return (
     <Card className="flex flex-col h-full">
-      <CardHeader className="flex-shrink-0 space-y-4">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <CardTitle>Transcript</CardTitle>
+      <CardHeader className="flex-shrink-0 space-y-2 lg:space-y-4 py-3 lg:py-6">
+        {/* Compact header on mobile, full on desktop - hidden on mobile */}
+        <div className="hidden lg:flex items-center gap-2 lg:gap-4 flex-wrap">
+          <div className="flex items-center gap-1.5 lg:gap-3">
+            <CardTitle className="text-sm lg:text-base">Transcript</CardTitle>
             {isLive && (
-              <Badge variant="destructive" className="animate-pulse">
-                <span className="relative flex h-2 w-2 mr-1.5">
+              <Badge variant="destructive" className="animate-pulse text-[10px] lg:text-xs h-4 lg:h-5 px-1.5 lg:px-2">
+                <span className="relative flex h-1.5 w-1.5 lg:h-2 lg:w-2 mr-1 lg:mr-1.5">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
+                  <span className="relative inline-flex rounded-full h-full w-full bg-white" />
                 </span>
                 Live
               </Badge>
             )}
           </div>
 
-          {/* Export */}
+          {/* Export - compact on mobile */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
-                <Download className="h-4 w-4 mr-2" />
-                Export
+              <Button variant="outline" size="sm" className="h-7 lg:h-9 px-2 lg:px-3 text-xs lg:text-sm gap-1 lg:gap-2">
+                <Download className="h-3.5 w-3.5 lg:h-4 lg:w-4" />
+                <span className="hidden sm:inline">Export</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -484,18 +485,18 @@ export function TranscriptViewer({
           </DropdownMenu>
         </div>
 
-        {/* Search and Filter Bar */}
-        <div className="flex flex-wrap items-center gap-2">
+        {/* Search and Filter Bar - compact on mobile */}
+        <div className="flex flex-wrap items-center gap-1.5 lg:gap-2">
           {/* Search */}
-          <div className="relative flex-1 min-w-[200px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <div className="relative flex-1 min-w-[150px] lg:min-w-[200px]">
+            <Search className="absolute left-2 lg:left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 lg:h-4 lg:w-4 text-muted-foreground" />
             <Input
               ref={searchInputRef}
-              placeholder="Search transcript... (Cmd+F)"
+              placeholder="Search... (Cmd+F)"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className={cn(
-                "pl-9 pr-9 transition-all",
+                "h-7 lg:h-9 pl-7 lg:pl-9 pr-7 lg:pr-9 text-xs lg:text-sm transition-all",
                 searchQuery && "ring-2 ring-primary/20"
               )}
             />
@@ -503,10 +504,10 @@ export function TranscriptViewer({
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                className="absolute right-0.5 lg:right-1 top-1/2 -translate-y-1/2 h-6 w-6 lg:h-7 lg:w-7"
                 onClick={() => setSearchQuery("")}
               >
-                <X className="h-4 w-4" />
+                <X className="h-3 w-3 lg:h-4 lg:w-4" />
               </Button>
             )}
           </div>
@@ -519,14 +520,14 @@ export function TranscriptViewer({
                   variant="outline"
                   size="sm"
                   className={cn(
-                    "gap-2",
+                    "h-7 lg:h-9 px-2 lg:px-3 text-xs lg:text-sm gap-1 lg:gap-2",
                     selectedSpeakers.length > 0 && "border-primary text-primary"
                   )}
                 >
-                  <Users className="h-4 w-4" />
-                  Speakers
+                  <Users className="h-3.5 w-3.5 lg:h-4 lg:w-4" />
+                  <span className="hidden sm:inline">Speakers</span>
                   {selectedSpeakers.length > 0 && (
-                    <Badge variant="secondary" className="ml-1 h-5 px-1.5">
+                    <Badge variant="secondary" className="ml-0.5 lg:ml-1 h-4 lg:h-5 px-1 lg:px-1.5 text-[10px] lg:text-xs">
                       {selectedSpeakers.length}
                     </Badge>
                   )}
@@ -601,10 +602,10 @@ export function TranscriptViewer({
         )}
       </CardHeader>
 
-      <CardContent className="flex-1 min-h-0">
+      <CardContent className="flex-1 min-h-0 flex flex-col">
         <div 
           ref={scrollRef}
-          className="h-[500px] pr-4 overflow-y-auto"
+          className="flex-1 min-h-0 pr-4 overflow-y-auto"
         >
           {filteredSegments.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center animate-fade-in">
