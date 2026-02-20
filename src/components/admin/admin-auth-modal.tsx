@@ -102,7 +102,7 @@ export function AdminAuthModal({ open, onOpenChange, onSuccess }: AdminAuthModal
               </Button>
             </div>
             <p className="text-xs text-muted-foreground">
-              This is the VEXA_ADMIN_API_KEY configured in your environment
+              This is the ADMIN_API_KEY configured in your environment
             </p>
           </div>
 

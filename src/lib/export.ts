@@ -1,4 +1,4 @@
-import type { Meeting, TranscriptSegment } from "@/types/vexa";
+import type { Meeting, TranscriptSegment } from "@/types/eggsplain";
 import { format } from "date-fns";
 
 // Format seconds to HH:MM:SS

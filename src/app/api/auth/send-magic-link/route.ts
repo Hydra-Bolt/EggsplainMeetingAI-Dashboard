@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { sendMagicLinkEmail } from "@/lib/email";
 import { getRegistrationConfig, validateEmailForRegistration } from "@/lib/registration";
-import { findUserByEmail, createUser, createUserToken } from "@/lib/vexa-admin-api";
+import { findUserByEmail, createUser, createUserToken } from "@/lib/eggsplain-admin-api";
 import { cookies } from "next/headers";
 
-const JWT_SECRET = process.env.JWT_SECRET || process.env.VEXA_ADMIN_API_KEY || "default-secret-change-me";
+const JWT_SECRET = process.env.JWT_SECRET || process.env.ADMIN_API_KEY || "default-secret-change-me";
 const MAGIC_LINK_EXPIRY = "15m"; // 15 minutes
 
 /**
@@ -19,22 +19,22 @@ function isSmtpConfigured(): boolean {
 }
 
 /**
- * Check if user exists in Vexa API
+ * Check if user exists in eggsplain API
  */
 async function checkUserExists(email: string): Promise<{ exists: boolean; error?: string }> {
-  const VEXA_ADMIN_API_URL = process.env.VEXA_ADMIN_API_URL || process.env.VEXA_API_URL || "http://localhost:18056";
-  const VEXA_ADMIN_API_KEY = process.env.VEXA_ADMIN_API_KEY || "";
+  const API_URL = process.env.API_URL || process.env.API_URL || "http://localhost:18056";
+  const ADMIN_API_KEY = process.env.ADMIN_API_KEY || "";
 
-  if (!VEXA_ADMIN_API_KEY) {
+  if (!ADMIN_API_KEY) {
     return { exists: false };
   }
 
   try {
     const response = await fetch(
-      `${VEXA_ADMIN_API_URL}/admin/users/email/${encodeURIComponent(email)}`,
+      `${API_URL}/admin/users/email/${encodeURIComponent(email)}`,
       {
         headers: {
-          "X-Admin-API-Key": VEXA_ADMIN_API_KEY,
+          "X-Admin-API-Key": ADMIN_API_KEY,
         },
         signal: AbortSignal.timeout(10000),
       }
@@ -51,7 +51,7 @@ async function checkUserExists(email: string): Promise<{ exists: boolean; error?
     if (response.status === 401 || response.status === 403) {
       return {
         exists: false,
-        error: "Invalid admin API key. Please check VEXA_ADMIN_API_KEY configuration.",
+        error: "Invalid admin API key. Please check ADMIN_API_KEY configuration.",
       };
     }
 
@@ -61,7 +61,7 @@ async function checkUserExists(email: string): Promise<{ exists: boolean; error?
     if (message.includes("timeout") || message.includes("abort")) {
       return {
         exists: false,
-        error: "Cannot reach Vexa API. Please check VEXA_API_URL configuration.",
+        error: "Cannot reach eggsplain API. Please check API_URL configuration.",
       };
     }
     return { exists: false, error: `API error: ${message}` };
@@ -126,7 +126,7 @@ async function handleDirectLogin(email: string): Promise<NextResponse> {
 
   // Set cookie
   const cookieStore = await cookies();
-  cookieStore.set("vexa-token", apiToken, {
+  cookieStore.set("eggsplain-token", apiToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
@@ -156,11 +156,11 @@ async function handleDirectLogin(email: string): Promise<NextResponse> {
  */
 export async function POST(request: NextRequest) {
   // Check Admin API configuration first
-  const adminApiKey = process.env.VEXA_ADMIN_API_KEY;
+  const adminApiKey = process.env.ADMIN_API_KEY;
 
   if (!adminApiKey || adminApiKey === "your_admin_api_key_here") {
     return NextResponse.json(
-      { error: "Authentication service not configured. Please set VEXA_ADMIN_API_KEY.", code: "ADMIN_API_NOT_CONFIGURED" },
+      { error: "Authentication service not configured. Please set ADMIN_API_KEY.", code: "ADMIN_API_NOT_CONFIGURED" },
       { status: 503 }
     );
   }

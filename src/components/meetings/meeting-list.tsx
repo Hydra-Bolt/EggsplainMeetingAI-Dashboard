@@ -5,7 +5,7 @@ import { MeetingCard } from "./meeting-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { useJoinModalStore } from "@/stores/join-modal-store";
-import type { Meeting } from "@/types/vexa";
+import type { Meeting } from "@/types/eggsplain";
 import { cn } from "@/lib/utils";
 
 interface MeetingListProps {

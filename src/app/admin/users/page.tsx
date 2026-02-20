@@ -29,7 +29,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { ErrorState } from "@/components/ui/error-state";
 import { useAdminStore } from "@/stores/admin-store";
-import type { CreateUserRequest } from "@/types/vexa";
+import type { CreateUserRequest } from "@/types/eggsplain";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { DocsLink } from "@/components/docs/docs-link";

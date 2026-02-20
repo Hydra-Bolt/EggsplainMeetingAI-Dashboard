@@ -1,8 +1,8 @@
 .PHONY: build push set-latest set-dev help
 
 # DockerHub configuration
-DOCKERHUB_USER ?= vexaai
-IMAGE_NAME ?= vexa-dashboard
+DOCKERHUB_USER ?= eggsplain
+IMAGE_NAME ?= eggsplain-meet-dashboard
 TAG ?= dev
 
 # Paths (Makefile and Dockerfile are in the same directory, context is repo root)
@@ -23,7 +23,7 @@ define set_tag
 endef
 
 help:
-	@echo "Vexa Dashboard Docker Build & Push"
+	@echo "Eggsplain Meet Dashboard Docker Build & Push"
 	@echo ""
 	@echo "Usage:"
 	@echo "  make build              - Build locally (tagged as dev)"

@@ -16,7 +16,7 @@ import { MeetingList } from "@/components/meetings/meeting-list";
 import { ErrorState } from "@/components/ui/error-state";
 import { useMeetingsStore } from "@/stores/meetings-store";
 import { useJoinModalStore } from "@/stores/join-modal-store";
-import type { Platform, MeetingStatus } from "@/types/vexa";
+import type { Platform, MeetingStatus } from "@/types/eggsplain";
 import { DocsLink } from "@/components/docs/docs-link";
 
 export default function MeetingsPage() {

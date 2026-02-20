@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { JoinForm } from "@/components/join/join-form";
 import { LiveSession } from "@/components/join/live-session";
-import type { Platform } from "@/types/vexa";
+import type { Platform } from "@/types/eggsplain";
 
 interface ActiveSession {
   meetingId: string;

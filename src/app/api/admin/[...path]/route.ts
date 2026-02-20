@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
-const ADMIN_COOKIE_NAME = "vexa-admin-session";
+const ADMIN_COOKIE_NAME = "eggsplain-admin-session";
 const COOKIE_MAX_AGE = 60 * 60 * 24; // 24 hours
 
 /**
@@ -34,7 +34,7 @@ async function verifyAdminSession(): Promise<boolean> {
 
 /**
  * Admin API Proxy
- * Forwards requests to Vexa Admin API with X-Admin-API-Key header
+ * Forwards requests to eggsplain Admin API with X-Admin-API-Key header
  * SECURITY: Requires valid admin session cookie
  */
 async function proxyRequest(
@@ -51,10 +51,10 @@ async function proxyRequest(
     );
   }
 
-  const VEXA_ADMIN_API_URL = process.env.VEXA_ADMIN_API_URL || process.env.VEXA_API_URL || "http://localhost:18056";
-  const VEXA_ADMIN_API_KEY = process.env.VEXA_ADMIN_API_KEY || "";
+  const API_URL = process.env.API_URL || process.env.API_URL || "http://localhost:18056";
+  const ADMIN_API_KEY = process.env.ADMIN_API_KEY || "";
 
-  if (!VEXA_ADMIN_API_KEY) {
+  if (!ADMIN_API_KEY) {
     return NextResponse.json(
       { error: "Admin API key not configured" },
       { status: 500 }
@@ -66,11 +66,11 @@ async function proxyRequest(
 
   // Build URL with query params
   const searchParams = request.nextUrl.searchParams.toString();
-  const url = `${VEXA_ADMIN_API_URL}/admin/${pathString}${searchParams ? `?${searchParams}` : ""}`;
+  const url = `${API_URL}/admin/${pathString}${searchParams ? `?${searchParams}` : ""}`;
 
   const headers: HeadersInit = {
     "Content-Type": "application/json",
-    "X-Admin-API-Key": VEXA_ADMIN_API_KEY,
+    "X-Admin-API-Key": ADMIN_API_KEY,
   };
 
   const fetchOptions: RequestInit = {

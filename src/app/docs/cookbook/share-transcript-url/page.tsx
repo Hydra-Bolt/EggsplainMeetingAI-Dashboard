@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Share Transcript URL | Vexa API Cookbook",
+  title: "Share Transcript URL | eggsplain API Cookbook",
   description: "Learn how to create shareable transcript URLs for ChatGPT, Perplexity, and other AI tools",
 };
 
@@ -116,7 +116,7 @@ const share = await createTranscriptShare(
 );
 
 // The share.url can be used directly:
-// https://api.vexa.ai/public/transcripts/abc123def456.txt`}</code>
+// https://api.eggsplain.ai/public/transcripts/abc123def456.txt`}</code>
                 </pre>
               </div>
             </TabsContent>
@@ -166,7 +166,7 @@ share = create_transcript_share(
 )
 
 # The share['url'] can be used directly:
-# https://api.vexa.ai/public/transcripts/abc123def456.txt`}</code>
+# https://api.eggsplain.ai/public/transcripts/abc123def456.txt`}</code>
                 </pre>
               </div>
             </TabsContent>
@@ -184,13 +184,13 @@ curl -X POST \\
 # Response:
 # {
 #   "share_id": "abc123def456",
-#   "url": "https://api.vexa.ai/public/transcripts/abc123def456.txt",
+#   "url": "https://api.eggsplain.ai/public/transcripts/abc123def456.txt",
 #   "expires_at": "2024-01-01T14:00:00Z",
 #   "expires_in_seconds": 7200
 # }
 
 # Access the transcript (no authentication required):
-curl "https://api.vexa.ai/public/transcripts/abc123def456.txt"`}</code>
+curl "https://api.eggsplain.ai/public/transcripts/abc123def456.txt"`}</code>
                 </pre>
               </div>
             </TabsContent>
@@ -378,7 +378,7 @@ await shareTranscriptWithAI(
               <pre className="bg-muted p-4 rounded-lg text-sm overflow-x-auto">
                 <code>{JSON.stringify({
                   share_id: "abc123def456",
-                  url: "https://api.vexa.ai/public/transcripts/abc123def456.txt",
+                  url: "https://api.eggsplain.ai/public/transcripts/abc123def456.txt",
                   expires_at: "2024-01-01T13:00:00Z",
                   expires_in_seconds: 3600
                 }, null, 2)}</code>

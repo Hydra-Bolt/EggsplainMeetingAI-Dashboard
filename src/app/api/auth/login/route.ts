@@ -6,10 +6,10 @@ import { cookies } from "next/headers";
  * The ADMIN_API_KEY is never exposed to the client
  */
 export async function POST(request: NextRequest) {
-  const VEXA_ADMIN_API_URL = process.env.VEXA_ADMIN_API_URL || process.env.VEXA_API_URL || "http://localhost:18056";
-  const VEXA_ADMIN_API_KEY = process.env.VEXA_ADMIN_API_KEY || "";
+  const API_URL = process.env.API_URL || process.env.API_URL || "http://localhost:18056";
+  const ADMIN_API_KEY = process.env.ADMIN_API_KEY || "";
 
-  if (!VEXA_ADMIN_API_KEY) {
+  if (!ADMIN_API_KEY) {
     return NextResponse.json(
       { error: "Server not configured for authentication" },
       { status: 500 }
@@ -29,10 +29,10 @@ export async function POST(request: NextRequest) {
     // Step 1: Try to find user by email
     let user = null;
     let userResponse = await fetch(
-      `${VEXA_ADMIN_API_URL}/admin/users/email/${encodeURIComponent(email)}`,
+      `${API_URL}/admin/users/email/${encodeURIComponent(email)}`,
       {
         headers: {
-          "X-Admin-API-Key": VEXA_ADMIN_API_KEY,
+          "X-Admin-API-Key": ADMIN_API_KEY,
         },
       }
     );
@@ -41,11 +41,11 @@ export async function POST(request: NextRequest) {
       user = await userResponse.json();
     } else if (userResponse.status === 404) {
       // Step 2: User doesn't exist - create them
-      const createResponse = await fetch(`${VEXA_ADMIN_API_URL}/admin/users`, {
+      const createResponse = await fetch(`${API_URL}/admin/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-Admin-API-Key": VEXA_ADMIN_API_KEY,
+          "X-Admin-API-Key": ADMIN_API_KEY,
         },
         body: JSON.stringify({
           email,
@@ -73,10 +73,10 @@ export async function POST(request: NextRequest) {
 
     // Step 3: Get user with tokens to check if they have one
     const userDetailResponse = await fetch(
-      `${VEXA_ADMIN_API_URL}/admin/users/${user.id}`,
+      `${API_URL}/admin/users/${user.id}`,
       {
         headers: {
-          "X-Admin-API-Key": VEXA_ADMIN_API_KEY,
+          "X-Admin-API-Key": ADMIN_API_KEY,
         },
       }
     );
@@ -94,12 +94,12 @@ export async function POST(request: NextRequest) {
     // Step 4: If user has no tokens, create one
     if (!userWithTokens.api_tokens || userWithTokens.api_tokens.length === 0) {
       const tokenResponse = await fetch(
-        `${VEXA_ADMIN_API_URL}/admin/users/${user.id}/tokens`,
+        `${API_URL}/admin/users/${user.id}/tokens`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-Admin-API-Key": VEXA_ADMIN_API_KEY,
+            "X-Admin-API-Key": ADMIN_API_KEY,
           },
         }
       );
@@ -119,12 +119,12 @@ export async function POST(request: NextRequest) {
       // Note: We can't retrieve the actual token value for existing tokens
       // So we need to create a new one for login
       const tokenResponse = await fetch(
-        `${VEXA_ADMIN_API_URL}/admin/users/${user.id}/tokens`,
+        `${API_URL}/admin/users/${user.id}/tokens`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-Admin-API-Key": VEXA_ADMIN_API_KEY,
+            "X-Admin-API-Key": ADMIN_API_KEY,
           },
         }
       );
@@ -143,7 +143,7 @@ export async function POST(request: NextRequest) {
 
     // Step 5: Set token in HTTP-only cookie for security
     const cookieStore = await cookies();
-    cookieStore.set("vexa-token", token, {
+    cookieStore.set("eggsplain-token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",

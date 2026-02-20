@@ -22,7 +22,7 @@ interface HealthStatus {
     smtp: { configured: boolean; optional?: boolean; error?: string };
     googleOAuth: { configured: boolean; optional?: boolean; error?: string };
     adminApi: { configured: boolean; reachable: boolean; error?: string };
-    vexaApi: { configured: boolean; reachable: boolean; error?: string };
+    eggsplainApi: { configured: boolean; reachable: boolean; error?: string };
   };
   missingConfig: string[];
 }
@@ -56,7 +56,7 @@ export default function LoginPage() {
             smtp: { configured: false, optional: true, error: "Cannot reach server" },
             googleOAuth: { configured: false, optional: true, error: "Cannot reach server" },
             adminApi: { configured: false, reachable: false, error: "Cannot reach server" },
-            vexaApi: { configured: false, reachable: false, error: "Cannot reach server" },
+            eggsplainApi: { configured: false, reachable: false, error: "Cannot reach server" },
           },
           missingConfig: [],
         });
@@ -330,7 +330,7 @@ export default function LoginPage() {
         </Card>
 
         <p className="text-center text-xs text-muted-foreground mt-6">
-          Eggsplain Meet Dashboard - Open Source Meeting Transcription
+          Eggsplain Meet Dashboard - Meeting Transcription
         </p>
       </div>
     </div>

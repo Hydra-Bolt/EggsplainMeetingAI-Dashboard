@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { vexaAPI } from "@/lib/api";
+import { eggsplainAPI } from "@/lib/api";
 import { AdminGuard } from "@/components/admin/admin-guard";
 
 interface AIConfig {
@@ -66,11 +66,11 @@ function SettingsContent() {
     setConnectionError(null);
 
     try {
-      const result = await vexaAPI.testConnection();
+      const result = await eggsplainAPI.testConnection();
       if (result.success) {
         setConnectionStatus("connected");
         toast.success("Connection successful", {
-          description: "Successfully connected to Vexa API",
+          description: "Successfully connected to Eggsplain Meet API",
         });
       } else {
         setConnectionStatus("error");
@@ -96,7 +96,7 @@ function SettingsContent() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
         <p className="text-muted-foreground">
-          Configure your Vexa Dashboard connection
+          Configure your Eggsplain Meet Dashboard connection
         </p>
       </div>
 
@@ -106,10 +106,10 @@ function SettingsContent() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Settings className="h-5 w-5" />
-              Vexa API Configuration
+              Eggsplain Meet API Configuration
             </CardTitle>
             <CardDescription>
-              Configure the connection to your Vexa instance. These settings are managed via environment variables.
+              Configure the connection to your Eggsplain Meet instance. These settings are managed via environment variables.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -123,7 +123,7 @@ function SettingsContent() {
                 className="font-mono bg-muted"
               />
               <p className="text-xs text-muted-foreground">
-                Set via <code className="bg-muted px-1 rounded">VEXA_API_URL</code> environment variable
+                Set via <code className="bg-muted px-1 rounded">API_URL</code> environment variable
               </p>
             </div>
 
@@ -137,7 +137,7 @@ function SettingsContent() {
                 className="font-mono bg-muted"
               />
               <p className="text-xs text-muted-foreground">
-                Auto-derived from <code className="bg-muted px-1 rounded">VEXA_API_URL</code>
+                Auto-derived from <code className="bg-muted px-1 rounded">API_URL</code>
               </p>
             </div>
 
@@ -153,7 +153,7 @@ function SettingsContent() {
                 <Badge variant="secondary">Configured</Badge>
               </div>
               <p className="text-xs text-muted-foreground">
-                Set via <code className="bg-muted px-1 rounded">VEXA_ADMIN_API_KEY</code> environment variable
+                Set via <code className="bg-muted px-1 rounded">ADMIN_API_KEY</code> environment variable
               </p>
             </div>
 
@@ -297,9 +297,9 @@ function SettingsContent() {
           </CardHeader>
           <CardContent>
             <pre className="bg-muted p-4 rounded-lg text-sm overflow-x-auto">
-{`# Vexa API Configuration (required)
-VEXA_API_URL=http://localhost:18056
-VEXA_ADMIN_API_KEY=your_admin_api_key_here
+{`# eggsplain API Configuration (required)
+API_URL=http://localhost:18056
+ADMIN_API_KEY=your_admin_api_key_here
 
 # AI Assistant Configuration (optional)
 # Format: provider/model
@@ -322,25 +322,16 @@ AI_API_KEY=your_ai_api_key_here`}
             <Separator />
             <div className="space-y-2">
               <p className="text-sm text-muted-foreground">
-                Vexa Dashboard is an open source web interface for Vexa, the self-hosted meeting transcription API.
+                Eggsplain Meet Dashboard is a web interface for Eggsplain Meet, the self-hosted meeting transcription API.
               </p>
               <div className="flex gap-4">
                 <a
-                  href="https://github.com/Vexa-ai/vexa"
+                  href="https://eggsplain.com"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-primary hover:underline inline-flex items-center gap-1"
                 >
-                  Vexa GitHub
-                  <ExternalLink className="h-3 w-3" />
-                </a>
-                <a
-                  href="https://vexa.ai"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-primary hover:underline inline-flex items-center gap-1"
-                >
-                  Vexa Website
+                  Eggsplain Website
                   <ExternalLink className="h-3 w-3" />
                 </a>
               </div>

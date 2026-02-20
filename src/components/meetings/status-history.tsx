@@ -5,7 +5,7 @@ import { formatDistanceToNow, format } from "date-fns";
 import { ChevronDown, Clock, User, Bot, Zap, CheckCircle2, XCircle, Radio, DoorOpen } from "lucide-react";
 import { cn, parseUTCTimestamp } from "@/lib/utils";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import type { StatusTransition, MeetingStatus } from "@/types/vexa";
+import type { StatusTransition, MeetingStatus } from "@/types/eggsplain";
 import { DocsLink } from "@/components/docs/docs-link";
 
 interface StatusHistoryProps {

@@ -104,7 +104,7 @@ export function DocsLink({ href, className, label = "api" }: DocsLinkProps) {
     // Function to read from localStorage
     const readDocsMode = () => {
       try {
-        const stored = localStorage.getItem("vexa-docs-mode");
+        const stored = localStorage.getItem("eggsplain-docs-mode");
         if (stored) {
           const parsed = JSON.parse(stored);
           setEnabled(parsed?.state?.enabled ?? false);
@@ -128,11 +128,11 @@ export function DocsLink({ href, className, label = "api" }: DocsLinkProps) {
     };
 
     window.addEventListener("storage", handleStorageChange);
-    window.addEventListener("vexa-docs-mode-change", handleCustomStorageChange);
+    window.addEventListener("eggsplain-docs-mode-change", handleCustomStorageChange);
     
     return () => {
       window.removeEventListener("storage", handleStorageChange);
-      window.removeEventListener("vexa-docs-mode-change", handleCustomStorageChange);
+      window.removeEventListener("eggsplain-docs-mode-change", handleCustomStorageChange);
     };
   }, []);
 

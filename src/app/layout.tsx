@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Eggsplain Meet Dashboard",
-  description: "Open source meeting transcription dashboard for Eggsplain Meet",
+  description: "Meeting transcription dashboard for Eggsplain Meet",
   icons: {
     icon: [
       {

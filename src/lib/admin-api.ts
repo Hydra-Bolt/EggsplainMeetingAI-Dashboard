@@ -1,10 +1,10 @@
 import type {
-  VexaUser,
-  VexaUserWithTokens,
+  eggsplainUser,
+  eggsplainUserWithTokens,
   CreateUserRequest,
   UpdateUserRequest,
   CreateTokenResponse,
-} from "@/types/vexa";
+} from "@/types/eggsplain";
 
 class AdminAPIError extends Error {
   constructor(
@@ -37,39 +37,39 @@ export const adminAPI = {
   // Users
   // ==========================================
 
-  async getUsers(skip = 0, limit = 100): Promise<VexaUser[]> {
+  async getUsers(skip = 0, limit = 100): Promise<eggsplainUser[]> {
     const response = await fetch(`/api/admin/users?skip=${skip}&limit=${limit}`);
-    const data = await handleResponse<VexaUser[] | { users: VexaUser[] }>(response);
+    const data = await handleResponse<eggsplainUser[] | { users: eggsplainUser[] }>(response);
     // Handle both array and object responses
     return Array.isArray(data) ? data : data.users || [];
   },
 
-  async getUser(userId: string): Promise<VexaUserWithTokens> {
+  async getUser(userId: string): Promise<eggsplainUserWithTokens> {
     const response = await fetch(`/api/admin/users/${userId}`);
-    return handleResponse<VexaUserWithTokens>(response);
+    return handleResponse<eggsplainUserWithTokens>(response);
   },
 
-  async getUserByEmail(email: string): Promise<VexaUser> {
+  async getUserByEmail(email: string): Promise<eggsplainUser> {
     const response = await fetch(`/api/admin/users/email/${encodeURIComponent(email)}`);
-    return handleResponse<VexaUser>(response);
+    return handleResponse<eggsplainUser>(response);
   },
 
-  async createUser(data: CreateUserRequest): Promise<VexaUser> {
+  async createUser(data: CreateUserRequest): Promise<eggsplainUser> {
     const response = await fetch("/api/admin/users", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
-    return handleResponse<VexaUser>(response);
+    return handleResponse<eggsplainUser>(response);
   },
 
-  async updateUser(userId: string, data: UpdateUserRequest): Promise<VexaUser> {
+  async updateUser(userId: string, data: UpdateUserRequest): Promise<eggsplainUser> {
     const response = await fetch(`/api/admin/users/${userId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
-    return handleResponse<VexaUser>(response);
+    return handleResponse<eggsplainUser>(response);
   },
 
   // ==========================================

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createHmac } from "crypto";
-import { getUserById, updateUser } from "@/lib/vexa-admin-api";
+import { getUserById, updateUser } from "@/lib/eggsplain-admin-api";
 
 type ZoomOAuthStatePayload = {
   userId: string;
@@ -23,7 +23,7 @@ function getStateSecret(): string {
   return (
     process.env.ZOOM_OAUTH_STATE_SECRET ||
     process.env.NEXTAUTH_SECRET ||
-    process.env.VEXA_ADMIN_API_KEY ||
+    process.env.ADMIN_API_KEY ||
     ""
   );
 }

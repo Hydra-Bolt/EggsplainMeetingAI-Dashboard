@@ -42,11 +42,11 @@ import { BotStatusIndicator, BotFailedIndicator } from "@/components/meetings/bo
 import { AIChatPanel } from "@/components/ai";
 import { useMeetingsStore } from "@/stores/meetings-store";
 import { useLiveTranscripts } from "@/hooks/use-live-transcripts";
-import { PLATFORM_CONFIG, getDetailedStatus } from "@/types/vexa";
-import type { MeetingStatus, Meeting } from "@/types/vexa";
+import { PLATFORM_CONFIG, getDetailedStatus } from "@/types/eggsplain";
+import type { MeetingStatus, Meeting } from "@/types/eggsplain";
 import { StatusHistory } from "@/components/meetings/status-history";
 import { cn } from "@/lib/utils";
-import { vexaAPI } from "@/lib/api";
+import { eggsplainAPI } from "@/lib/api";
 import { toast } from "sonner";
 import { LanguagePicker } from "@/components/language-picker";
 import { WHISPER_LANGUAGE_CODES, getLanguageDisplayName } from "@/lib/languages";
@@ -124,7 +124,7 @@ export default function MeetingDetailPage() {
   // ChatGPT prompt editing state
   const [chatgptPrompt, setChatgptPrompt] = useState(() => {
     if (typeof window !== "undefined") {
-      return getCookie("vexa-chatgpt-prompt") || "Read from {url} so I can ask questions about it.";
+      return getCookie("eggsplain-chatgpt-prompt") || "Read from {url} so I can ask questions about it.";
     }
     return "Read from {url} so I can ask questions about it.";
   });
@@ -164,7 +164,7 @@ export default function MeetingDetailPage() {
     return availableRecordings.map(rec => {
       const audioMedia = rec.media_files.find(mf => mf.type === "audio")!;
       return {
-        src: vexaAPI.getRecordingAudioUrl(rec.id, audioMedia.id),
+        src: eggsplainAPI.getRecordingAudioUrl(rec.id, audioMedia.id),
         duration: audioMedia.duration_seconds || 0,
         sessionUid: rec.session_uid,
         createdAt: rec.created_at,
@@ -263,7 +263,7 @@ export default function MeetingDetailPage() {
     if (!currentMeeting) return;
     setIsStoppingBot(true);
     try {
-      await vexaAPI.stopBot(currentMeeting.platform, currentMeeting.platform_specific_id);
+      await eggsplainAPI.stopBot(currentMeeting.platform, currentMeeting.platform_specific_id);
       // Optimistic transition to post-meeting UI immediately after stop is accepted.
       setForcePostMeetingMode(true);
       updateMeetingStatus(String(currentMeeting.id), "stopping");
@@ -286,7 +286,7 @@ export default function MeetingDetailPage() {
     if (!currentMeeting) return;
     setIsUpdatingConfig(true);
     try {
-      await vexaAPI.updateBotConfig(currentMeeting.platform, currentMeeting.platform_specific_id, {
+      await eggsplainAPI.updateBotConfig(currentMeeting.platform, currentMeeting.platform_specific_id, {
         language: newLanguage === "auto" ? undefined : newLanguage,
         task: "transcribe", // Always use transcribe mode
       });
@@ -423,7 +423,7 @@ export default function MeetingDetailPage() {
 
     // Prefer link-based flow (like "Read from https://..." in ChatGPT/Perplexity)
     try {
-      const share = await vexaAPI.createTranscriptShare(
+      const share = await eggsplainAPI.createTranscriptShare(
         currentMeeting.platform,
         currentMeeting.platform_specific_id,
         meetingId
@@ -486,7 +486,7 @@ export default function MeetingDetailPage() {
     const trimmed = editedChatgptPrompt.trim();
     if (trimmed && trimmed !== chatgptPrompt) {
       setChatgptPrompt(trimmed);
-      setCookie("vexa-chatgpt-prompt", trimmed);
+      setCookie("eggsplain-chatgpt-prompt", trimmed);
     }
   }, [editedChatgptPrompt, chatgptPrompt]);
 

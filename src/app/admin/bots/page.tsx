@@ -38,10 +38,10 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { vexaAPI } from "@/lib/api";
+import { eggsplainAPI } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import type { Meeting, MeetingStatus, Platform } from "@/types/vexa";
+import type { Meeting, MeetingStatus, Platform } from "@/types/eggsplain";
 
 const STATUS_CONFIG: Record<MeetingStatus, { label: string; color: string; icon: React.ElementType }> = {
   requested: { label: "Requested", color: "bg-gray-100 text-gray-700", icon: Clock },
@@ -64,8 +64,8 @@ export default function AdminBotsPage() {
     if (showRefresh) setIsRefreshing(true);
     try {
       const [meetingsData, botsData] = await Promise.all([
-        vexaAPI.getMeetings(),
-        vexaAPI.getBotStatus().catch(() => ({ running_bots: [] })),
+        eggsplainAPI.getMeetings(),
+        eggsplainAPI.getBotStatus().catch(() => ({ running_bots: [] })),
       ]);
       setMeetings(meetingsData);
       setRunningBots(botsData.running_bots || []);
@@ -96,7 +96,7 @@ export default function AdminBotsPage() {
 
     setStoppingBots(prev => new Set(prev).add(key));
     try {
-      await vexaAPI.stopBot(platform, nativeId);
+      await eggsplainAPI.stopBot(platform, nativeId);
       toast.success("Bot stopped successfully");
       // Wait a bit before refreshing to let the backend update
       setTimeout(() => fetchData(true), 500);

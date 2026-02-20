@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://dashboard.vexa.ai";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://dashboard.eggsplain.ai";
 
   // Main pages
   const mainPages = [

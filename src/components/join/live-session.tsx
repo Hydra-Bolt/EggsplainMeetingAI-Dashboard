@@ -8,11 +8,11 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 import { TranscriptSegment } from "@/components/transcript/transcript-segment";
-import { useVexaWebSocket } from "@/hooks/use-vexa-websocket";
+import { useeggsplainWebSocket } from "@/hooks/use-eggsplain-websocket";
 import { useLiveStore } from "@/stores/live-store";
-import { vexaAPI } from "@/lib/api";
-import type { Platform } from "@/types/vexa";
-import { PLATFORM_CONFIG, MEETING_STATUS_CONFIG, getSpeakerColor } from "@/types/vexa";
+import { eggsplainAPI } from "@/lib/api";
+import type { Platform } from "@/types/eggsplain";
+import { PLATFORM_CONFIG, MEETING_STATUS_CONFIG, getSpeakerColor } from "@/types/eggsplain";
 import { cn } from "@/lib/utils";
 import { DocsLink } from "@/components/docs/docs-link";
 
@@ -30,7 +30,7 @@ export function LiveSession({ platform, nativeId, onEnd }: LiveSessionProps) {
     clearLiveSession,
   } = useLiveStore();
 
-  const { isConnecting, isConnected, error } = useVexaWebSocket({
+  const { isConnecting, isConnected, error } = useeggsplainWebSocket({
     platform,
     nativeId,
     autoConnect: true,
@@ -52,7 +52,7 @@ export function LiveSession({ platform, nativeId, onEnd }: LiveSessionProps) {
 
   const handleStopBot = async () => {
     try {
-      await vexaAPI.stopBot(platform, nativeId);
+      await eggsplainAPI.stopBot(platform, nativeId);
       toast.success("Bot stopped", {
         description: "The transcription bot has left the meeting",
       });

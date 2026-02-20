@@ -10,7 +10,7 @@ interface HealthStatus {
     smtp: { configured: boolean; optional: boolean; error?: string };
     googleOAuth: { configured: boolean; optional: boolean; error?: string };
     adminApi: { configured: boolean; reachable: boolean; error?: string };
-    vexaApi: { configured: boolean; reachable: boolean; error?: string };
+    eggsplainApi: { configured: boolean; reachable: boolean; error?: string };
   };
   missingConfig: string[];
 }
@@ -26,7 +26,7 @@ export async function GET() {
       smtp: { configured: false, optional: true },
       googleOAuth: { configured: false, optional: true },
       adminApi: { configured: false, reachable: false },
-      vexaApi: { configured: false, reachable: false },
+      eggsplainApi: { configured: false, reachable: false },
     },
     missingConfig: [],
   };
@@ -69,8 +69,8 @@ export async function GET() {
   }
 
   // Check Admin API configuration
-  const adminApiKey = process.env.VEXA_ADMIN_API_KEY;
-  const adminApiUrl = process.env.VEXA_ADMIN_API_URL || process.env.VEXA_API_URL;
+  const adminApiKey = process.env.ADMIN_API_KEY;
+  const adminApiUrl = process.env.API_URL || process.env.API_URL;
 
   if (adminApiKey && adminApiKey !== "your_admin_api_key_here") {
     status.checks.adminApi.configured = true;
@@ -100,7 +100,7 @@ export async function GET() {
         } else if (response.status === 404) {
           // Admin endpoints not found - likely only Bot Manager is deployed
           status.checks.adminApi.reachable = false;
-          status.checks.adminApi.error = "Admin API endpoints not found. Ensure Vexa admin service is running.";
+          status.checks.adminApi.error = "Admin API endpoints not found. Ensure eggsplain admin service is running.";
         } else if (response.status >= 500) {
           status.checks.adminApi.reachable = false;
           status.checks.adminApi.error = `Server error: ${response.status}`;
@@ -118,54 +118,54 @@ export async function GET() {
     }
   } else {
     status.checks.adminApi.error = "Admin API key not configured";
-    status.missingConfig.push("VEXA_ADMIN_API_KEY");
+    status.missingConfig.push("ADMIN_API_KEY");
   }
 
-  // Check Vexa API configuration
-  const vexaApiUrl = process.env.VEXA_API_URL;
+  // Check eggsplain API configuration
+  const eggsplainApiUrl = process.env.API_URL;
 
-  if (vexaApiUrl) {
-    status.checks.vexaApi.configured = true;
+  if (eggsplainApiUrl) {
+    status.checks.eggsplainApi.configured = true;
 
-    // Test Vexa API reachability - check root endpoint
+    // Test eggsplain API reachability - check root endpoint
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-      const response = await fetch(`${vexaApiUrl}/`, {
+      const response = await fetch(`${eggsplainApiUrl}/`, {
         method: "GET",
         signal: controller.signal,
       });
       clearTimeout(timeoutId);
 
       // Any response < 500 means server is reachable
-      status.checks.vexaApi.reachable = response.status < 500;
+      status.checks.eggsplainApi.reachable = response.status < 500;
       if (response.status >= 500) {
-        status.checks.vexaApi.error = `Server error: ${response.status}`;
+        status.checks.eggsplainApi.error = `Server error: ${response.status}`;
       }
     } catch (error) {
       const err = error as Error;
       if (err.name === "AbortError") {
-        status.checks.vexaApi.error = "Connection timeout";
+        status.checks.eggsplainApi.error = "Connection timeout";
       } else {
-        status.checks.vexaApi.error = `Cannot reach API: ${err.message || "unknown error"}`;
+        status.checks.eggsplainApi.error = `Cannot reach API: ${err.message || "unknown error"}`;
       }
     }
   } else {
-    status.checks.vexaApi.error = "Vexa API URL not configured";
-    status.missingConfig.push("VEXA_API_URL");
+    status.checks.eggsplainApi.error = "eggsplain API URL not configured";
+    status.missingConfig.push("API_URL");
   }
 
   // Determine overall status
   // Only Admin API is required. SMTP is optional (enables magic-link, otherwise direct login).
   const hasAdminApi = status.checks.adminApi.configured && status.checks.adminApi.reachable;
-  const hasVexaApi = status.checks.vexaApi.configured;
+  const haseggsplainApi = status.checks.eggsplainApi.configured;
 
   if (!hasAdminApi) {
     // Admin API is required for authentication
     status.status = "error";
-  } else if (!hasVexaApi || !status.checks.vexaApi.reachable) {
-    // Vexa API is needed for full functionality but not login
+  } else if (!haseggsplainApi || !status.checks.eggsplainApi.reachable) {
+    // eggsplain API is needed for full functionality but not login
     status.status = "degraded";
   }
 

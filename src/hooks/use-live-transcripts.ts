@@ -8,9 +8,9 @@ import type {
   TranscriptSegment,
   WebSocketSegment,
   ChatMessage,
-} from "@/types/vexa";
+} from "@/types/eggsplain";
 import { useMeetingsStore } from "@/stores/meetings-store";
-import { vexaAPI } from "@/lib/api";
+import { eggsplainAPI } from "@/lib/api";
 
 interface UseLiveTranscriptsOptions {
   platform: Platform;
@@ -97,7 +97,7 @@ export function useLiveTranscripts(
 
     try {
       console.log(`[LiveTranscripts] Bootstrapping from REST API: ${platform}/${nativeId}`);
-      const segments = await vexaAPI.getTranscripts(platform, nativeId);
+      const segments = await eggsplainAPI.getTranscripts(platform, nativeId);
       console.log(`[LiveTranscripts] Bootstrapped ${segments.length} segments from REST API`);
       
       // Bootstrap the transcript map (algorithm step 1)
@@ -169,7 +169,7 @@ export function useLiveTranscripts(
     }
 
     // Append auth token as query parameter if available
-    // Vexa uses X-API-Key header for REST, but browsers can't set WS headers
+    // eggsplain uses X-API-Key header for REST, but browsers can't set WS headers
     // So we pass it as api_key query parameter
     if (authToken) {
       const separator = wsUrl.includes("?") ? "&" : "?";

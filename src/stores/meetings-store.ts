@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import type { Meeting, TranscriptSegment, Platform, MeetingStatus, RecordingData, ChatMessage } from "@/types/vexa";
-import { VexaAPIError, vexaAPI } from "@/lib/api";
+import type { Meeting, TranscriptSegment, Platform, MeetingStatus, RecordingData, ChatMessage } from "@/types/eggsplain";
+import { eggsplainAPIError, eggsplainAPI } from "@/lib/api";
 import { deduplicateOverlappingSegments } from "@/lib/transcript-dedup";
 
 interface MeetingDataUpdate {
@@ -79,7 +79,7 @@ export const useMeetingsStore = create<MeetingsState>((set, get) => ({
   fetchMeetings: async () => {
     set({ isLoadingMeetings: true, error: null });
     try {
-      const meetings = (await vexaAPI.getMeetings()).filter((m) => !isHiddenDeletedMeeting(m));
+      const meetings = (await eggsplainAPI.getMeetings()).filter((m) => !isHiddenDeletedMeeting(m));
       // Sort by created_at descending (most recent first)
       meetings.sort((a, b) =>
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
@@ -105,7 +105,7 @@ export const useMeetingsStore = create<MeetingsState>((set, get) => ({
 
     try {
       // Always fetch fresh data from the API to ensure we have the latest meeting state
-      const meetings = (await vexaAPI.getMeetings()).filter((m) => !isHiddenDeletedMeeting(m));
+      const meetings = (await eggsplainAPI.getMeetings()).filter((m) => !isHiddenDeletedMeeting(m));
       meetings.sort((a, b) =>
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       );
@@ -132,7 +132,7 @@ export const useMeetingsStore = create<MeetingsState>((set, get) => ({
   // Silently refresh meeting data (for polling without UI flicker)
   refreshMeeting: async (id: string) => {
     try {
-      const meetings = (await vexaAPI.getMeetings()).filter((m) => !isHiddenDeletedMeeting(m));
+      const meetings = (await eggsplainAPI.getMeetings()).filter((m) => !isHiddenDeletedMeeting(m));
       meetings.sort((a, b) =>
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       );
@@ -159,7 +159,7 @@ export const useMeetingsStore = create<MeetingsState>((set, get) => ({
   fetchTranscripts: async (platform: Platform, nativeId: string) => {
     set({ isLoadingTranscripts: true, error: null });
     try {
-      const result = await vexaAPI.getMeetingWithTranscripts(platform, nativeId);
+      const result = await eggsplainAPI.getMeetingWithTranscripts(platform, nativeId);
       // Reuse the same canonical pipeline as WS/bootstraps:
       // - filter invalid
       // - sort by absolute_start_time
@@ -182,7 +182,7 @@ export const useMeetingsStore = create<MeetingsState>((set, get) => ({
   updateMeetingData: async (platform: Platform, nativeId: string, data: MeetingDataUpdate) => {
     set({ isUpdatingMeeting: true });
     try {
-      const updatedMeeting = await vexaAPI.updateMeetingData(platform, nativeId, data);
+      const updatedMeeting = await eggsplainAPI.updateMeetingData(platform, nativeId, data);
 
       // Update current meeting if it matches
       const { currentMeeting, meetings } = get();
@@ -202,7 +202,7 @@ export const useMeetingsStore = create<MeetingsState>((set, get) => ({
   },
 
   deleteMeeting: async (platform: Platform, nativeId: string, meetingId?: string) => {
-    await vexaAPI.deleteMeeting(platform, nativeId);
+    await eggsplainAPI.deleteMeeting(platform, nativeId);
 
     const targetId = meetingId ? String(meetingId) : null;
     const { meetings, currentMeeting } = get();
@@ -393,10 +393,10 @@ export const useMeetingsStore = create<MeetingsState>((set, get) => ({
     }
 
     try {
-      const result = await vexaAPI.getChatMessages(platform, nativeId);
+      const result = await eggsplainAPI.getChatMessages(platform, nativeId);
       set({ chatMessages: result.messages });
     } catch (error) {
-      if (error instanceof VexaAPIError && error.status === 404) {
+      if (error instanceof eggsplainAPIError && error.status === 404) {
         // Backward compatibility: older backends do not expose this endpoint.
         const isMissingRoute = error.message === "Not Found";
         if (isMissingRoute) {

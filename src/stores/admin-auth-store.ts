@@ -68,7 +68,7 @@ export const useAdminAuthStore = create<AdminAuthState>()(
       clearError: () => set({ error: null }),
     }),
     {
-      name: "vexa-admin-auth",
+      name: "eggsplain-admin-auth",
       partialize: (state) => ({
         isAdminAuthenticated: state.isAdminAuthenticated,
       }),

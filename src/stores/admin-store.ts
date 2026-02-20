@@ -1,17 +1,17 @@
 import { create } from "zustand";
 import { adminAPI } from "@/lib/admin-api";
 import type {
-  VexaUser,
-  VexaUserWithTokens,
+  eggsplainUser,
+  eggsplainUserWithTokens,
   CreateUserRequest,
   UpdateUserRequest,
   CreateTokenResponse,
-} from "@/types/vexa";
+} from "@/types/eggsplain";
 
 interface AdminState {
   // Data
-  users: VexaUser[];
-  selectedUser: VexaUserWithTokens | null;
+  users: eggsplainUser[];
+  selectedUser: eggsplainUserWithTokens | null;
 
   // Loading states
   isLoadingUsers: boolean;
@@ -28,7 +28,7 @@ interface AdminState {
   // Actions
   fetchUsers: () => Promise<void>;
   fetchUser: (userId: string) => Promise<void>;
-  createUser: (data: CreateUserRequest) => Promise<VexaUser | null>;
+  createUser: (data: CreateUserRequest) => Promise<eggsplainUser | null>;
   updateUser: (userId: string, data: UpdateUserRequest) => Promise<void>;
   createToken: (userId: string) => Promise<CreateTokenResponse | null>;
   revokeToken: (tokenId: string) => Promise<void>;

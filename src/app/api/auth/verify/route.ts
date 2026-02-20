@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 import { getRegistrationConfig, validateEmailForRegistration } from "@/lib/registration";
-import { findUserByEmail, createUser, createUserToken, type ApiError } from "@/lib/vexa-admin-api";
+import { findUserByEmail, createUser, createUserToken, type ApiError } from "@/lib/eggsplain-admin-api";
 
-const JWT_SECRET = process.env.JWT_SECRET || process.env.VEXA_ADMIN_API_KEY || "default-secret-change-me";
+const JWT_SECRET = process.env.JWT_SECRET || process.env.ADMIN_API_KEY || "default-secret-change-me";
 
 interface MagicLinkPayload {
   email: string;
@@ -69,10 +69,10 @@ function apiErrorToResponse(apiError: ApiError, context: string): NextResponse<V
  * Verify magic link token and complete login
  */
 export async function POST(request: NextRequest) {
-  const VEXA_ADMIN_API_KEY = process.env.VEXA_ADMIN_API_KEY || "";
+  const ADMIN_API_KEY = process.env.ADMIN_API_KEY || "";
 
   // Check configuration first
-  if (!VEXA_ADMIN_API_KEY || VEXA_ADMIN_API_KEY === "your_admin_api_key_here") {
+  if (!ADMIN_API_KEY || ADMIN_API_KEY === "your_admin_api_key_here") {
     return errorResponse(
       "Authentication service not configured. Please contact the administrator.",
       503,
@@ -180,7 +180,7 @@ export async function POST(request: NextRequest) {
 
     // Step 5: Set token in HTTP-only cookie
     const cookieStore = await cookies();
-    cookieStore.set("vexa-token", apiToken, {
+    cookieStore.set("eggsplain-token", apiToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",

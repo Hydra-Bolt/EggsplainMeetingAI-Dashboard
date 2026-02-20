@@ -19,8 +19,8 @@ import {
   DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
 import { TranscriptSegment } from "./transcript-segment";
-import type { Meeting, TranscriptSegment as TranscriptSegmentType, ChatMessage } from "@/types/vexa";
-import { getSpeakerColor } from "@/types/vexa";
+import type { Meeting, TranscriptSegment as TranscriptSegmentType, ChatMessage } from "@/types/eggsplain";
+import { getSpeakerColor } from "@/types/eggsplain";
 import {
   exportToTxt,
   exportToJson,
@@ -121,10 +121,13 @@ export function TranscriptViewer({
 
   // ChatGPT prompt state
   const [chatgptPrompt, setChatgptPrompt] = useState(() => {
-    if (typeof window !== "undefined") {
-      return getCookie("vexa-chatgpt-prompt") || "Read from {url} so I can ask questions about it.";
-    }
-    return "Read from {url} so I can ask questions about it.";
+    const getPrompt = () => {
+      if (typeof window !== "undefined") {
+        return getCookie("eggsplain-chatgpt-prompt") || "Read from {url} so I can ask questions about it.";
+      }
+      return "Read from {url} so I can ask questions about it.";
+    };
+    return getPrompt();
   });
   const [isChatgptPromptExpanded, setIsChatgptPromptExpanded] = useState(false);
   const [editedChatgptPrompt, setEditedChatgptPrompt] = useState(chatgptPrompt);
@@ -671,7 +674,7 @@ export function TranscriptViewer({
     // Prefer link-based flow
     try {
       const response = await fetch(
-        `/api/vexa/transcripts/${meeting.platform}/${meeting.platform_specific_id}/share?meeting_id=${encodeURIComponent(meeting.id)}`,
+        `/api/eggsplain/transcripts/${meeting.platform}/${meeting.platform_specific_id}/share?meeting_id=${encodeURIComponent(meeting.id)}`,
         { method: "POST" }
       );
       if (response.ok) {
@@ -720,12 +723,13 @@ export function TranscriptViewer({
 
   // Handle saving ChatGPT prompt to cookie
   const handleChatgptPromptBlur = useCallback(() => {
-    const trimmed = editedChatgptPrompt.trim();
-    if (trimmed && trimmed !== chatgptPrompt) {
+    const savePrompt = (text: string) => {
+      const trimmed = text.trim();
       setChatgptPrompt(trimmed);
-      setCookie("vexa-chatgpt-prompt", trimmed);
-    }
-  }, [editedChatgptPrompt, chatgptPrompt]);
+      setCookie("eggsplain-chatgpt-prompt", trimmed);
+    };
+    savePrompt(editedChatgptPrompt);
+  }, [editedChatgptPrompt, setChatgptPrompt]);
 
   if (isLoading) {
     return (

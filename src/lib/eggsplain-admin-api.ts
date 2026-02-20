@@ -1,5 +1,5 @@
 /**
- * Vexa Admin API client with robust error handling
+ * Eggsplain Admin API client with robust error handling
  */
 
 const DEFAULT_TIMEOUT = 15000; // 15 seconds
@@ -18,7 +18,7 @@ export interface ApiResult<T> {
 }
 
 /**
- * Parse error response from Vexa API
+ * Parse error response from Eggsplain API
  */
 async function parseErrorResponse(response: Response): Promise<ApiError> {
   const status = response.status;
@@ -83,7 +83,7 @@ async function parseErrorResponse(response: Response): Promise<ApiError> {
     case 500:
       return {
         code: "SERVER_ERROR",
-        message: "Vexa API server error. Please try again later.",
+        message: "Eggsplain API server error. Please try again later.",
         details,
         status,
       };
@@ -92,7 +92,7 @@ async function parseErrorResponse(response: Response): Promise<ApiError> {
     case 504:
       return {
         code: "SERVICE_UNAVAILABLE",
-        message: "Vexa API is temporarily unavailable. Please try again later.",
+        message: "Eggsplain API is temporarily unavailable. Please try again later.",
         details,
         status,
       };
@@ -107,17 +107,17 @@ async function parseErrorResponse(response: Response): Promise<ApiError> {
 }
 
 /**
- * Make a request to Vexa Admin API with proper error handling
+ * Make a request to Eggsplain Admin API with proper error handling
  */
 async function adminRequest<T>(
   path: string,
   options: RequestInit = {},
   timeout = DEFAULT_TIMEOUT
 ): Promise<ApiResult<T>> {
-  const VEXA_ADMIN_API_URL = process.env.VEXA_ADMIN_API_URL || process.env.VEXA_API_URL || "http://localhost:18056";
-  const VEXA_ADMIN_API_KEY = process.env.VEXA_ADMIN_API_KEY || "";
+  const API_URL = process.env.API_URL || process.env.API_URL || "http://localhost:18056";
+  const ADMIN_API_KEY = process.env.ADMIN_API_KEY || "";
 
-  if (!VEXA_ADMIN_API_KEY || VEXA_ADMIN_API_KEY === "your_admin_api_key_here") {
+  if (!ADMIN_API_KEY || ADMIN_API_KEY === "your_admin_api_key_here") {
     return {
       success: false,
       error: {
@@ -128,7 +128,7 @@ async function adminRequest<T>(
     };
   }
 
-  const url = `${VEXA_ADMIN_API_URL}${path}`;
+  const url = `${API_URL}${path}`;
 
   try {
     const controller = new AbortController();
@@ -138,7 +138,7 @@ async function adminRequest<T>(
       ...options,
       headers: {
         "Content-Type": "application/json",
-        "X-Admin-API-Key": VEXA_ADMIN_API_KEY,
+        "X-Admin-API-Key": ADMIN_API_KEY,
         ...options.headers,
       },
       signal: controller.signal,
@@ -167,7 +167,7 @@ async function adminRequest<T>(
         success: false,
         error: {
           code: "TIMEOUT",
-          message: "Request timed out. Vexa API may be slow or unreachable.",
+          message: "Request timed out. Eggsplain API may be slow or unreachable.",
           status: 408,
         },
       };
@@ -179,7 +179,7 @@ async function adminRequest<T>(
         success: false,
         error: {
           code: "NETWORK_ERROR",
-          message: "Cannot reach Vexa API. Check your network connection and VEXA_API_URL.",
+          message: "Cannot reach Eggsplain API. Check your network connection and API_URL.",
           details: err.message,
           status: 0,
         },
@@ -192,7 +192,7 @@ async function adminRequest<T>(
         success: false,
         error: {
           code: "DNS_ERROR",
-          message: "Cannot resolve Vexa API hostname. Check VEXA_API_URL configuration.",
+          message: "Cannot resolve Eggsplain API hostname. Check API_URL configuration.",
           details: err.message,
           status: 0,
         },
@@ -205,7 +205,7 @@ async function adminRequest<T>(
         success: false,
         error: {
           code: "CONNECTION_REFUSED",
-          message: "Connection refused. Vexa API may not be running.",
+          message: "Connection refused. Eggsplain API may not be running.",
           details: err.message,
           status: 0,
         },
@@ -228,7 +228,7 @@ async function adminRequest<T>(
 // User API
 // ============================================================================
 
-export interface VexaUserData {
+export interface EggsplainUserData {
   id: string;
   email: string;
   name: string;
@@ -240,8 +240,8 @@ export interface VexaUserData {
 /**
  * Find user by email
  */
-export async function findUserByEmail(email: string): Promise<ApiResult<VexaUserData>> {
-  return adminRequest<VexaUserData>(`/admin/users/email/${encodeURIComponent(email)}`);
+export async function findUserByEmail(email: string): Promise<ApiResult<EggsplainUserData>> {
+  return adminRequest<EggsplainUserData>(`/admin/users/email/${encodeURIComponent(email)}`);
 }
 
 /**
@@ -251,8 +251,8 @@ export async function createUser(data: {
   email: string;
   name?: string;
   max_concurrent_bots?: number;
-}): Promise<ApiResult<VexaUserData>> {
-  return adminRequest<VexaUserData>("/admin/users", {
+}): Promise<ApiResult<EggsplainUserData>> {
+  return adminRequest<EggsplainUserData>("/admin/users", {
     method: "POST",
     body: JSON.stringify({
       email: data.email,
@@ -274,8 +274,8 @@ export async function createUserToken(userId: string): Promise<ApiResult<{ token
 /**
  * Get user by ID (includes data and possibly API tokens depending on backend config)
  */
-export async function getUserById(userId: string): Promise<ApiResult<VexaUserData>> {
-  return adminRequest<VexaUserData>(`/admin/users/${encodeURIComponent(userId)}`);
+export async function getUserById(userId: string): Promise<ApiResult<EggsplainUserData>> {
+  return adminRequest<EggsplainUserData>(`/admin/users/${encodeURIComponent(userId)}`);
 }
 
 /**
@@ -289,8 +289,8 @@ export async function updateUser(
     max_concurrent_bots?: number;
     data?: Record<string, unknown>;
   }
-): Promise<ApiResult<VexaUserData>> {
-  return adminRequest<VexaUserData>(`/admin/users/${encodeURIComponent(userId)}`, {
+): Promise<ApiResult<EggsplainUserData>> {
+  return adminRequest<EggsplainUserData>(`/admin/users/${encodeURIComponent(userId)}`, {
     method: "PATCH",
     body: JSON.stringify(payload),
   });
@@ -304,7 +304,7 @@ export async function updateUser(
  * Check if Admin API is reachable and properly configured
  */
 export async function checkAdminApiHealth(): Promise<ApiResult<{ reachable: boolean }>> {
-  const result = await adminRequest<VexaUserData[]>("/admin/users?limit=1");
+  const result = await adminRequest<EggsplainUserData[]>("/admin/users?limit=1");
 
   if (result.success) {
     return { success: true, data: { reachable: true } };
@@ -316,7 +316,7 @@ export async function checkAdminApiHealth(): Promise<ApiResult<{ reachable: bool
       success: false,
       error: {
         ...result.error,
-        message: "Vexa API is reachable but Admin API key is invalid",
+        message: "Eggsplain API is reachable but Admin API key is invalid",
       },
     };
   }

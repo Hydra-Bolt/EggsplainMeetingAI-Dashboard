@@ -7,11 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { vexaAPI } from "@/lib/api";
+import { eggsplainAPI } from "@/lib/api";
 import { useLiveStore } from "@/stores/live-store";
 import { useRuntimeConfig } from "@/hooks/use-runtime-config";
-import type { Platform, CreateBotRequest } from "@/types/vexa";
-import { PLATFORM_CONFIG } from "@/types/vexa";
+import type { Platform, CreateBotRequest } from "@/types/eggsplain";
+import { PLATFORM_CONFIG } from "@/types/eggsplain";
 import { LanguagePicker } from "@/components/language-picker";
 import { cn } from "@/lib/utils";
 import { DocsLink } from "@/components/docs/docs-link";
@@ -99,7 +99,7 @@ export function JoinForm({ onSuccess }: JoinFormProps) {
     }
 
     try {
-      const meeting = await vexaAPI.createBot(request);
+      const meeting = await eggsplainAPI.createBot(request);
 
       toast.success("Bot joining meeting", {
         description: "The transcription bot is connecting to the meeting",
@@ -119,7 +119,7 @@ export function JoinForm({ onSuccess }: JoinFormProps) {
         try {
           toast.info("Zoom authentication required", {
             description:
-              "Redirecting to Zoom. Sign in with the Zoom account that owns or is allowed to use the Vexa app to avoid \"Application not found\".",
+              "Redirecting to Zoom. Sign in with the Zoom account that owns or is allowed to use the Eggsplain Meet app to avoid \"Application not found\".",
           });
           await startZoomOAuth({
             userEmail: user.email,

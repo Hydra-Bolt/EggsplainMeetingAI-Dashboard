@@ -6,11 +6,11 @@ import type {
   WebSocketIncomingMessage,
   TranscriptSegment,
   MeetingStatus,
-} from "@/types/vexa";
+} from "@/types/eggsplain";
 import { useLiveStore } from "@/stores/live-store";
-import { vexaAPI } from "@/lib/api";
+import { eggsplainAPI } from "@/lib/api";
 
-interface UseVexaWebSocketOptions {
+interface UseeggsplainWebSocketOptions {
   platform: Platform;
   nativeId: string;
   onTranscript?: (segment: TranscriptSegment) => void;
@@ -19,7 +19,7 @@ interface UseVexaWebSocketOptions {
   autoConnect?: boolean;
 }
 
-interface UseVexaWebSocketReturn {
+interface UseeggsplainWebSocketReturn {
   isConnecting: boolean;
   isConnected: boolean;
   error: string | null;
@@ -56,9 +56,9 @@ function buildWsUrl(baseUrl: string, authToken: string | null): string {
   return `${baseUrl}${separator}api_key=${encodeURIComponent(authToken)}`;
 }
 
-export function useVexaWebSocket(
-  options: UseVexaWebSocketOptions
-): UseVexaWebSocketReturn {
+export function useeggsplainWebSocket(
+  options: UseeggsplainWebSocketOptions
+): UseeggsplainWebSocketReturn {
   const { platform, nativeId, onTranscript, onStatusChange, onError, autoConnect = true } = options;
 
   const wsRef = useRef<WebSocket | null>(null);
@@ -100,7 +100,7 @@ export function useVexaWebSocket(
 
         switch (message.type) {
           case "transcript.mutable":
-            // Process all segments from the payload (Vexa sends segments array)
+            // Process all segments from the payload (eggsplain sends segments array)
             if (message.payload?.segments) {
               for (const seg of message.payload.segments) {
                 // Skip empty segments or those missing required fields
@@ -162,15 +162,15 @@ export function useVexaWebSocket(
     if (bootstrappedRef.current) return;
 
     try {
-      console.log(`[VexaWebSocket] Bootstrapping transcripts from REST API: ${platform}/${nativeId}`);
-      const segments = await vexaAPI.getTranscripts(platform, nativeId);
-      console.log(`[VexaWebSocket] Bootstrapped ${segments.length} segments from REST API`);
+      console.log(`[eggsplainWebSocket] Bootstrapping transcripts from REST API: ${platform}/${nativeId}`);
+      const segments = await eggsplainAPI.getTranscripts(platform, nativeId);
+      console.log(`[eggsplainWebSocket] Bootstrapped ${segments.length} segments from REST API`);
       
       // Bootstrap the live transcripts store
       bootstrapLiveTranscripts(segments);
       bootstrappedRef.current = true;
     } catch (error) {
-      console.error("[VexaWebSocket] Bootstrap from REST API failed:", error);
+      console.error("[eggsplainWebSocket] Bootstrap from REST API failed:", error);
       // Continue anyway - WebSocket will provide segments
       bootstrappedRef.current = true;
     }

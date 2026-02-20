@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/ui/logo";
 import { toast } from "sonner";
-import { vexaAPI } from "@/lib/api";
+import { eggsplainAPI } from "@/lib/api";
 import { consumePendingZoomBotRequest } from "@/lib/zoom-oauth-client";
 import { useLiveStore } from "@/stores/live-store";
 import { useMeetingsStore } from "@/stores/meetings-store";
@@ -38,7 +38,7 @@ function ZoomCallbackContent() {
         const msg =
           oauthError === "access_denied"
             ? "Zoom authorization was cancelled or denied."
-            : `Zoom authorization was not completed: ${oauthError}. If you saw \"Application not found\", sign in to Zoom with the account that owns or is allowed to use the Vexa app, then try again.`;
+            : `Zoom authorization was not completed: ${oauthError}. If you saw \"Application not found\", sign in to Zoom with the account that owns or is allowed to use the eggsplain app, then try again.`;
         setError(msg);
         return;
       }
@@ -69,7 +69,7 @@ function ZoomCallbackContent() {
         if (!mounted) return;
         setState("starting_meeting");
         try {
-          const meeting = await vexaAPI.createBot(pendingRequest);
+          const meeting = await eggsplainAPI.createBot(pendingRequest);
           if (!mounted) return;
           setActiveMeeting(meeting);
           setCurrentMeeting(meeting);

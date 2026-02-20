@@ -1,27 +1,27 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { VexaUser } from "@/types/vexa";
+import type { eggsplainUser } from "@/types/eggsplain";
 
 interface LoginResult {
   success: boolean;
   error?: string;
   mode?: "direct" | "magic-link";
-  user?: VexaUser;
+  user?: eggsplainUser;
   token?: string;
   isNewUser?: boolean;
 }
 
 interface AuthState {
-  user: VexaUser | null;
+  user: eggsplainUser | null;
   token: string | null;
   isLoading: boolean;
   isAuthenticated: boolean;
 
   // Actions
   sendMagicLink: (email: string) => Promise<LoginResult>;
-  setAuth: (user: VexaUser, token: string) => void;
+  setAuth: (user: eggsplainUser, token: string) => void;
   logout: () => void;
-  setUser: (user: VexaUser | null) => void;
+  setUser: (user: eggsplainUser | null) => void;
   setToken: (token: string | null) => void;
   checkAuth: () => Promise<void>;
 
@@ -84,7 +84,7 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      setAuth: (user: VexaUser, token: string) => {
+      setAuth: (user: eggsplainUser, token: string) => {
         set({
           user,
           token,
@@ -188,7 +188,7 @@ export const useAuthStore = create<AuthState>()(
       },
     }),
     {
-      name: "vexa-auth",
+      name: "eggsplain-auth",
       partialize: (state) => ({
         user: state.user,
         token: state.token,

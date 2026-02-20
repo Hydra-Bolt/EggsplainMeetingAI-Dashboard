@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Play } from "lucide-react";
-import type { TranscriptSegment as TranscriptSegmentType, SpeakerColor } from "@/types/vexa";
+import type { TranscriptSegment as TranscriptSegmentType, SpeakerColor } from "@/types/eggsplain";
 
 interface TranscriptSegmentProps {
   segment: TranscriptSegmentType;

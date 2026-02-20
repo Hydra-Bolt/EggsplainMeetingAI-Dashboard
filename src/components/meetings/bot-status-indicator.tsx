@@ -5,9 +5,9 @@ import { Loader2, Check, Clock, DoorOpen, Radio, XCircle, AlertTriangle, Refresh
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn, parseUTCTimestamp } from "@/lib/utils";
-import { vexaAPI } from "@/lib/api";
+import { eggsplainAPI } from "@/lib/api";
 import { toast } from "sonner";
-import type { MeetingStatus, Platform } from "@/types/vexa";
+import type { MeetingStatus, Platform } from "@/types/eggsplain";
 import { DocsLink } from "@/components/docs/docs-link";
 
 // Timeout in seconds before showing a warning
@@ -52,7 +52,7 @@ export function BotStatusIndicator({ status, platform, meetingId, createdAt, upd
   const handleStopBot = useCallback(async () => {
     setIsStopping(true);
     try {
-      await vexaAPI.stopBot(platform as Platform, meetingId);
+      await eggsplainAPI.stopBot(platform as Platform, meetingId);
       toast.success("Bot stopped", {
         description: "The bot has been stopped and resources freed.",
       });

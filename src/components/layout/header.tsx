@@ -41,7 +41,7 @@ export function Header({ onMenuClick }: HeaderProps) {
   useEffect(() => {
     // Read from localStorage on mount
     try {
-      const stored = localStorage.getItem("vexa-docs-mode");
+      const stored = localStorage.getItem("eggsplain-docs-mode");
       if (stored) {
         const parsed = JSON.parse(stored);
         setDocsModeEnabled(parsed?.state?.enabled ?? false);
@@ -53,7 +53,7 @@ export function Header({ onMenuClick }: HeaderProps) {
     // Listen for changes
     const handleStorageChange = () => {
       try {
-        const stored = localStorage.getItem("vexa-docs-mode");
+        const stored = localStorage.getItem("eggsplain-docs-mode");
         if (stored) {
           const parsed = JSON.parse(stored);
           setDocsModeEnabled(parsed?.state?.enabled ?? false);
@@ -71,17 +71,17 @@ export function Header({ onMenuClick }: HeaderProps) {
     const newValue = !docsModeEnabled;
     setDocsModeEnabled(newValue);
     try {
-      const stored = localStorage.getItem("vexa-docs-mode");
+      const stored = localStorage.getItem("eggsplain-docs-mode");
       const existing = stored ? JSON.parse(stored) : {};
       localStorage.setItem(
-        "vexa-docs-mode",
+        "eggsplain-docs-mode",
         JSON.stringify({
           ...existing,
           state: { enabled: newValue },
         })
       );
       // Trigger custom event for same-tab updates
-      window.dispatchEvent(new CustomEvent("vexa-docs-mode-change"));
+      window.dispatchEvent(new CustomEvent("eggsplain-docs-mode-change"));
     } catch {
       // Ignore errors
     }
@@ -109,7 +109,7 @@ export function Header({ onMenuClick }: HeaderProps) {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 font-semibold group">
           <Logo size="md" showText={false} className="group-hover:scale-105 transition-transform" />
-          <span className="hidden sm:inline-block">Vexa Dashboard</span>
+          <span className="hidden sm:inline-block">Eggsplain Meet Dashboard</span>
         </Link>
 
         {/* Spacer */}
@@ -154,7 +154,7 @@ export function Header({ onMenuClick }: HeaderProps) {
                     </div>
                   </div>
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    When enabled, contextual API documentation badges appear throughout the UI, showing you how to perform the same actions using the Vexa API.
+                    When enabled, contextual API documentation badges appear throughout the UI, showing you how to perform the same actions using the Eggsplain Meet API.
                   </p>
                 </div>
                 

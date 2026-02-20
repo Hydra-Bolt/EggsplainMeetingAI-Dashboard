@@ -1,6 +1,6 @@
-import type { CreateBotRequest } from "@/types/vexa";
+import type { CreateBotRequest } from "@/types/eggsplain";
 
-const PENDING_ZOOM_BOT_REQUEST_KEY = "vexa.pending_zoom_bot_request";
+const PENDING_ZOOM_BOT_REQUEST_KEY = "eggsplain.pending_zoom_bot_request";
 
 type ZoomOAuthStartResponse = {
   authUrl: string;

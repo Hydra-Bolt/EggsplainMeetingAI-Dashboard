@@ -1,4 +1,4 @@
-import { VexaAPIError } from "@/lib/api";
+import { EggsplainAPIError } from "@/lib/api";
 
 export interface UserFriendlyError {
   title: string;
@@ -28,7 +28,7 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
   }
 
   // Authentication errors
-  if (error instanceof VexaAPIError && error.status === 401) {
+  if (error instanceof EggsplainAPIError && error.status === 401) {
     return {
       title: "Authentication failed",
       description: "Your session may have expired. Please log in again.",
@@ -36,7 +36,7 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
   }
 
   // Forbidden
-  if (error instanceof VexaAPIError && error.status === 403) {
+  if (error instanceof EggsplainAPIError && error.status === 403) {
     return {
       title: "Access denied",
       description: error.message || "You don't have permission to perform this action.",
@@ -44,7 +44,7 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
   }
 
   // Server errors
-  if (error instanceof VexaAPIError && error.status >= 500) {
+  if (error instanceof EggsplainAPIError && error.status >= 500) {
     return {
       title: "Server error",
       description: "The server encountered an issue. Please try again later.",

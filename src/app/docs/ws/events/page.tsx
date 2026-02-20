@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const metadata: Metadata = {
-  title: "WebSocket Events | Vexa API Documentation",
+  title: "WebSocket Events | Eggsplain API Documentation",
   description: "Reference for WebSocket event types and message formats",
 };
 

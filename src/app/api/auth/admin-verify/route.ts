@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
-const ADMIN_COOKIE_NAME = "vexa-admin-session";
+const ADMIN_COOKIE_NAME = "eggsplain-admin-session";
 const COOKIE_MAX_AGE = 60 * 60 * 24; // 24 hours
 
 export async function POST(request: NextRequest) {
@@ -15,9 +15,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const VEXA_ADMIN_API_KEY = process.env.VEXA_ADMIN_API_KEY || "";
+    const ADMIN_API_KEY = process.env.ADMIN_API_KEY || "";
 
-    if (!VEXA_ADMIN_API_KEY) {
+    if (!ADMIN_API_KEY) {
       return NextResponse.json(
         { error: "Admin API not configured" },
         { status: 500 }
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify the token matches the configured admin key
-    if (token !== VEXA_ADMIN_API_KEY) {
+    if (token !== ADMIN_API_KEY) {
       return NextResponse.json(
         { error: "Invalid admin token" },
         { status: 401 }

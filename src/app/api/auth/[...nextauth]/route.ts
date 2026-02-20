@@ -1,7 +1,7 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { cookies } from "next/headers";
-import { findUserByEmail, createUser, createUserToken } from "@/lib/vexa-admin-api";
+import { findUserByEmail, createUser, createUserToken } from "@/lib/eggsplain-admin-api";
 import { getRegistrationConfig, validateEmailForRegistration } from "@/lib/registration";
 
 // Check if Google OAuth is enabled
@@ -48,13 +48,13 @@ export const authOptions: NextAuthOptions = {
       // This callback is called after successful OAuth but before session creation
       if (account?.provider === "google" && user.email) {
         try {
-          // Step 1: Find or create user in Vexa Admin API
-          let vexaUser;
+          // Step 1: Find or create user in eggsplain Admin API
+          let eggsplainUser;
           const findResult = await findUserByEmail(user.email);
           let isNewUser = false;
 
           if (findResult.success && findResult.data) {
-            vexaUser = findResult.data;
+            eggsplainUser = findResult.data;
           } else if (findResult.error?.code === "NOT_FOUND") {
             // Check registration restrictions
             const config = getRegistrationConfig();
@@ -76,7 +76,7 @@ export const authOptions: NextAuthOptions = {
               return false;
             }
 
-            vexaUser = createResult.data;
+            eggsplainUser = createResult.data;
             isNewUser = true;
           } else {
             console.error(`[NextAuth] Error finding user for ${user.email}:`, findResult.error);
@@ -84,7 +84,7 @@ export const authOptions: NextAuthOptions = {
           }
 
           // Step 2: Create API token for the user
-          const tokenResult = await createUserToken(vexaUser.id);
+          const tokenResult = await createUserToken(eggsplainUser.id);
 
           if (!tokenResult.success || !tokenResult.data) {
             console.error(`[NextAuth] Failed to create token for ${user.email}:`, tokenResult.error);
@@ -95,7 +95,7 @@ export const authOptions: NextAuthOptions = {
 
           // Step 3: Set cookie (same as existing auth flow)
           const cookieStore = await cookies();
-          cookieStore.set("vexa-token", apiToken, {
+          cookieStore.set("eggsplain-token", apiToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: "lax",
@@ -103,9 +103,9 @@ export const authOptions: NextAuthOptions = {
             path: "/",
           });
 
-          // Store Vexa user info in the user object for the JWT callback
-          (user as any).vexaUser = vexaUser;
-          (user as any).vexaToken = apiToken;
+          // Store eggsplain user info in the user object for the JWT callback
+          (user as any).eggsplainUser = eggsplainUser;
+          (user as any).eggsplainToken = apiToken;
           (user as any).isNewUser = isNewUser;
 
           return true;
@@ -118,19 +118,19 @@ export const authOptions: NextAuthOptions = {
       return false; // Deny sign-in for other providers
     },
     async jwt({ token, user }) {
-      // Persist the Vexa user data to the token
-      if (user && (user as any).vexaUser) {
-        token.vexaUser = (user as any).vexaUser;
-        token.vexaToken = (user as any).vexaToken;
+      // Persist the eggsplain user data to the token
+      if (user && (user as any).eggsplainUser) {
+        token.eggsplainUser = (user as any).eggsplainUser;
+        token.eggsplainToken = (user as any).eggsplainToken;
         token.isNewUser = (user as any).isNewUser;
       }
       return token;
     },
     async session({ session, token }) {
-      // Add Vexa user data to the session
-      if (token.vexaUser) {
-        (session as any).vexaUser = token.vexaUser;
-        (session as any).vexaToken = token.vexaToken;
+      // Add eggsplain user data to the session
+      if (token.eggsplainUser) {
+        (session as any).eggsplainUser = token.eggsplainUser;
+        (session as any).eggsplainToken = token.eggsplainToken;
         (session as any).isNewUser = token.isNewUser;
       }
       return session;
@@ -146,7 +146,7 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
-  secret: process.env.NEXTAUTH_SECRET || process.env.VEXA_ADMIN_API_KEY,
+  secret: process.env.NEXTAUTH_SECRET || process.env.ADMIN_API_KEY,
 };
 
 const handler = NextAuth(authOptions);

@@ -8,11 +8,11 @@ services:
       - "6000:3000"
     environment:
       # Eggsplain Meet API Connection (runtime configuration)
-      - VEXA_API_URL=${VEXA_API_URL:-http://eggsplain-api:18056}
+      - API_URL=${API_URL:-http://eggsplain-api:18056}
 
       # Admin API (required for authentication)
-      - VEXA_ADMIN_API_KEY=${VEXA_ADMIN_API_KEY}
-      - VEXA_ADMIN_API_URL=${VEXA_ADMIN_API_URL:-}
+      - ADMIN_API_KEY=${ADMIN_API_KEY}
+      - ADMIN_API_URL=${ADMIN_API_URL:-}
 
       # SMTP Configuration
       - SMTP_HOST=${SMTP_HOST}
@@ -37,13 +37,13 @@ services:
   # Uncomment the section below to run Eggsplain Meet alongside the dashboard
   #
   # eggsplain-api:
-  #   image: ghcr.io/vexa-ai/vexa:latest
+  #   image: ghcr.io/eggsplain/eggsplain:latest
   #   ports:
   #     - "18056:18056"
   #   volumes:
   #     - eggsplain-data:/data
   #   environment:
-  #     - DATABASE_URL=postgresql://postgres:postgres@db:5432/vexa
+  #     - DATABASE_URL=postgresql://postgres:postgres@db:5432/eggsplain
   #   depends_on:
   #     - db
   #   restart: unless-stopped
@@ -55,7 +55,7 @@ services:
   #   environment:
   #     - POSTGRES_USER=postgres
   #     - POSTGRES_PASSWORD=postgres
-  #     - POSTGRES_DB=vexa
+  #     - POSTGRES_DB=eggsplain
   #   volumes:
   #     - postgres-data:/var/lib/postgresql/data
   #   restart: unless-stopped

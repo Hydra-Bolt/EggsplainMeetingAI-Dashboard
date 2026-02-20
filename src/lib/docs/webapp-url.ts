@@ -4,10 +4,10 @@
 export function getWebappUrl(): string {
   if (typeof window !== "undefined") {
     // Client-side: use environment variable or default
-    return process.env.NEXT_PUBLIC_WEBAPP_URL || "https://webapp.vexa.ai";
+    return process.env.NEXT_PUBLIC_WEBAPP_URL || "https://webapp.eggsplain.ai";
   }
   // Server-side: use environment variable or default
-  return process.env.NEXT_PUBLIC_WEBAPP_URL || "https://webapp.vexa.ai";
+  return process.env.NEXT_PUBLIC_WEBAPP_URL || "https://webapp.eggsplain.ai";
 }
 
 /**

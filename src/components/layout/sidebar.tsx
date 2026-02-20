@@ -211,10 +211,10 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             </a>
             <div>
               <p className="text-xs text-muted-foreground">
-                Vexa Dashboard v1.0
+                Eggsplain Meet Dashboard v1.0
               </p>
               <p className="text-xs text-muted-foreground">
-                Open Source Meeting Transcription
+                Meeting Transcription
               </p>
             </div>
           </div>

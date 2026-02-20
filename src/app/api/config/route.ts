@@ -7,10 +7,10 @@ import { cookies } from "next/headers";
  * Also returns the user's auth token for WebSocket authentication.
  */
 export async function GET() {
-  const apiUrl = process.env.VEXA_API_URL || "http://localhost:18056";
+  const apiUrl = process.env.API_URL || "http://localhost:18056";
 
-  // Derive WebSocket URL from API URL (can be overridden with NEXT_PUBLIC_VEXA_WS_URL)
-  let wsUrl = process.env.NEXT_PUBLIC_VEXA_WS_URL;
+  // Derive WebSocket URL from API URL (can be overridden with NEXT_PUBLIC_WS_URL)
+  let wsUrl = process.env.NEXT_PUBLIC_WS_URL;
 
   if (!wsUrl) {
     // Convert http(s) to ws(s)
@@ -21,7 +21,7 @@ export async function GET() {
 
   // Get user's auth token from cookie for WebSocket authentication
   const cookieStore = await cookies();
-  const authToken = cookieStore.get("vexa-token")?.value;
+  const authToken = cookieStore.get("eggsplain-token")?.value;
 
   // Get default bot name from environment (optional)
   const defaultBotName = process.env.DEFAULT_BOT_NAME || null;

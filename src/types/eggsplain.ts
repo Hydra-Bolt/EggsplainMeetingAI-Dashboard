@@ -1,4 +1,4 @@
-// Vexa API Types
+// Eggsplain API Types
 
 export type Platform = "google_meet" | "teams" | "zoom";
 
@@ -24,7 +24,7 @@ export interface Meeting {
   updated_at?: string;
 }
 
-// Status transition record from Vexa API
+// Status transition record from Eggsplain API
 export interface StatusTransition {
   from: MeetingStatus | string;
   to: MeetingStatus | string;
@@ -42,7 +42,7 @@ export interface MeetingData {
   notes?: string;
   participants?: string[];
   languages?: string[];
-  // Bot status details (may be populated by Vexa API)
+  // Bot status details (may be populated by Eggsplain API)
   error?: string;
   error_code?: string;
   status_message?: string;
@@ -441,7 +441,7 @@ export interface RecordingData {
 // Admin API Types
 // ==========================================
 
-export interface VexaUser {
+export interface EggsplainUser {
   id: string;
   email: string;
   name: string;
@@ -451,7 +451,7 @@ export interface VexaUser {
   created_at: string;
 }
 
-export interface VexaUserWithTokens extends VexaUser {
+export interface EggsplainUserWithTokens extends EggsplainUser {
   api_tokens: APIToken[];
 }
 
@@ -476,7 +476,7 @@ export interface UpdateUserRequest {
 }
 
 export interface UsersListResponse {
-  users: VexaUser[];
+  users: EggsplainUser[];
   total: number;
   skip: number;
   limit: number;

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { Meeting, TranscriptSegment, Platform, MeetingStatus } from "@/types/vexa";
+import type { Meeting, TranscriptSegment, Platform, MeetingStatus } from "@/types/eggsplain";
 import { deduplicateOverlappingSegments } from "@/lib/transcript-dedup";
 
 interface LiveMeetingState {

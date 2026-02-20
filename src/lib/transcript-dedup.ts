@@ -1,4 +1,4 @@
-import type { TranscriptSegment } from "@/types/vexa";
+import type { TranscriptSegment } from "@/types/eggsplain";
 import { parseUTCTimestamp } from "./utils";
 
 /**

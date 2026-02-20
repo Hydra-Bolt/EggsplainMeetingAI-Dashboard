@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { APIEndpointDoc } from "@/components/docs/api-endpoint-doc";
 
 export const metadata: Metadata = {
-  title: "Transcripts API | Vexa API Documentation",
+  title: "Transcripts API | eggsplain API Documentation",
   description: "API reference for fetching and sharing meeting transcripts",
 };
 
@@ -24,7 +24,7 @@ export default function TranscriptsPage() {
         method="GET"
         path="/transcripts/{platform}/{native_meeting_id}"
         authType="user"
-        dashboardProxy="/api/vexa/transcripts/{platform}/{native_meeting_id}"
+        dashboardProxy="/api/eggsplain/transcripts/{platform}/{native_meeting_id}"
         pathParams={[
           {
             name: "platform",
@@ -82,7 +82,7 @@ export default function TranscriptsPage() {
         method="POST"
         path="/transcripts/{platform}/{native_meeting_id}/share"
         authType="user"
-        dashboardProxy="/api/vexa/transcripts/{platform}/{native_meeting_id}/share"
+        dashboardProxy="/api/eggsplain/transcripts/{platform}/{native_meeting_id}/share"
         pathParams={[
           {
             name: "platform",
@@ -113,7 +113,7 @@ export default function TranscriptsPage() {
         ]}
         responseExample={{
           share_id: "abc123def456",
-          url: "https://api.vexa.ai/public/transcripts/abc123def456.txt",
+          url: "https://api.eggsplain.ai/public/transcripts/abc123def456.txt",
           expires_at: "2024-01-01T13:00:00Z",
           expires_in_seconds: 3600,
         }}

@@ -6,25 +6,25 @@ async function proxyRequest(
   params: Promise<{ path: string[] }>,
   method: string
 ): Promise<NextResponse> {
-  const VEXA_API_URL = process.env.VEXA_API_URL || "http://localhost:18056";
+  const API_URL = process.env.API_URL || "http://localhost:18056";
 
   // Get user's token from HTTP-only cookie (set during login)
   const cookieStore = await cookies();
-  const userToken = cookieStore.get("vexa-token")?.value;
+  const userToken = cookieStore.get("eggsplain-token")?.value;
 
   // Fall back to env variable for backwards compatibility
-  const VEXA_API_KEY = userToken || process.env.VEXA_API_KEY || "";
+  const eggsplain_API_KEY = userToken || process.env.eggsplain_API_KEY || "";
 
   const { path } = await params;
   const pathString = path.join("/");
-  const url = `${VEXA_API_URL}/${pathString}`;
+  const url = `${API_URL}/${pathString}`;
 
   const headers: HeadersInit = {
     "Content-Type": "application/json",
   };
 
-  if (VEXA_API_KEY) {
-    headers["X-API-Key"] = VEXA_API_KEY;
+  if (eggsplain_API_KEY) {
+    headers["X-API-Key"] = eggsplain_API_KEY;
   }
 
   // Forward Range header for audio/video seeking support
@@ -80,7 +80,7 @@ async function proxyRequest(
     const isTimeout = error instanceof DOMException && error.name === "AbortError";
     console.error(`Proxy ${isTimeout ? "timeout" : "error"} for ${method} ${url}:`, error);
     return NextResponse.json(
-      { error: isTimeout ? "Backend request timed out" : "Failed to connect to Vexa API",
+      { error: isTimeout ? "Backend request timed out" : "Failed to connect to eggsplain API",
         details: (error as Error).message },
       { status: isTimeout ? 504 : 502 }
     );

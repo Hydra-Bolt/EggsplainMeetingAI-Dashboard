@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { MessageSquare } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useMeetingsStore } from "@/stores/meetings-store";
-import type { ChatMessage, Platform } from "@/types/vexa";
+import type { ChatMessage, Platform } from "@/types/eggsplain";
 import { cn } from "@/lib/utils";
 
 interface ChatPanelProps {

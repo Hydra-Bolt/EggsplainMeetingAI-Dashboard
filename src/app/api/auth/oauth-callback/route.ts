@@ -10,24 +10,24 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session || !(session as any).vexaUser) {
+    if (!session || !(session as any).eggsplainUser) {
       return NextResponse.json(
         { error: "Not authenticated via OAuth" },
         { status: 401 }
       );
     }
 
-    const vexaUser = (session as any).vexaUser;
-    const token = (session as any).vexaToken;
+    const eggsplainUser = (session as any).eggsplainUser;
+    const token = (session as any).eggsplainToken;
 
     // Return user info in the same format as the login endpoint
     return NextResponse.json({
       user: {
-        id: vexaUser.id,
-        email: vexaUser.email,
-        name: vexaUser.name,
-        max_concurrent_bots: vexaUser.max_concurrent_bots,
-        created_at: vexaUser.created_at,
+        id: eggsplainUser.id,
+        email: eggsplainUser.email,
+        name: eggsplainUser.name,
+        max_concurrent_bots: eggsplainUser.max_concurrent_bots,
+        created_at: eggsplainUser.created_at,
       },
       token,
       isNewUser: (session as any).isNewUser || false,

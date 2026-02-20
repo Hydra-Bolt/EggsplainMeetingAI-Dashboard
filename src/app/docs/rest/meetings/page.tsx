@@ -2,7 +2,7 @@
 import { APIEndpointDoc } from "@/components/docs/api-endpoint-doc";
 
 export const metadata: Metadata = {
-  title: "Meetings API | Vexa API Documentation",
+  title: "Meetings API | eggsplain API Documentation",
   description: "API reference for managing meetings and meeting metadata",
 };
 
@@ -24,7 +24,7 @@ export default function MeetingsPage() {
         method="GET"
         path="/meetings"
         authType="user"
-        dashboardProxy="/api/vexa/meetings"
+        dashboardProxy="/api/eggsplain/meetings"
         responseExample={{
           meetings: [
             {
@@ -58,7 +58,7 @@ export default function MeetingsPage() {
           method="GET"
           path="/meetings/{id}"
           authType="user"
-          dashboardProxy="/api/vexa/meetings/{id}"
+          dashboardProxy="/api/eggsplain/meetings/{id}"
           pathParams={[
             {
               name: "id",
@@ -100,7 +100,7 @@ export default function MeetingsPage() {
         method="PATCH"
         path="/meetings/{platform}/{native_meeting_id}"
         authType="user"
-        dashboardProxy="/api/vexa/meetings/{platform}/{native_meeting_id}"
+        dashboardProxy="/api/eggsplain/meetings/{platform}/{native_meeting_id}"
         pathParams={[
           {
             name: "platform",

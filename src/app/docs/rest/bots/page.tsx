@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { APIEndpointDoc } from "@/components/docs/api-endpoint-doc";
 
 export const metadata: Metadata = {
-  title: "Bots API | Vexa API Documentation",
+  title: "Bots API | eggsplain API Documentation",
   description: "API reference for managing transcription bots",
 };
 
@@ -24,14 +24,14 @@ export default function BotsPage() {
         method="POST"
         path="/bots"
         authType="user"
-        dashboardProxy="/api/vexa/bots"
+        dashboardProxy="/api/eggsplain/bots"
         requestBody={{
           description: "Bot configuration",
           schema: {
             platform: "google_meet",
             native_meeting_id: "abc-defg-hij",
             passcode: "optional_passcode",
-            bot_name: "Vexa Transcription Bot",
+            bot_name: "eggsplain Transcription Bot",
             language: "en",
           },
         }}
@@ -80,7 +80,7 @@ export default function BotsPage() {
         method="DELETE"
         path="/bots/{platform}/{native_meeting_id}"
         authType="user"
-        dashboardProxy="/api/vexa/bots/{platform}/{native_meeting_id}"
+        dashboardProxy="/api/eggsplain/bots/{platform}/{native_meeting_id}"
         pathParams={[
           {
             name: "platform",
@@ -118,7 +118,7 @@ export default function BotsPage() {
         method="PUT"
         path="/bots/{platform}/{native_meeting_id}/config"
         authType="user"
-        dashboardProxy="/api/vexa/bots/{platform}/{native_meeting_id}/config"
+        dashboardProxy="/api/eggsplain/bots/{platform}/{native_meeting_id}/config"
         pathParams={[
           {
             name: "platform",
@@ -164,7 +164,7 @@ export default function BotsPage() {
           method="GET"
           path="/bots/status"
           authType="user"
-          dashboardProxy="/api/vexa/bots/status"
+          dashboardProxy="/api/eggsplain/bots/status"
           responseExample={{
             running_bots: [
               {
