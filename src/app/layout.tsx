@@ -16,19 +16,19 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Vexa Dashboard",
-  description: "Open source meeting transcription dashboard for Vexa",
+  title: "Eggsplain Meet Dashboard",
+  description: "Open source meeting transcription dashboard for Eggsplain Meet",
   icons: {
     icon: [
       {
-        url: "/icons/vexadark.svg",
-        type: "image/svg+xml",
+        url: "/icons/icon.jpg",
+        type: "image/jpeg",
       },
     ],
     apple: [
       {
-        url: "/icons/vexadark.svg",
-        type: "image/svg+xml",
+        url: "/icons/icon.jpg",
+        type: "image/jpeg",
       },
     ],
   },

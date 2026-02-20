@@ -92,7 +92,7 @@ export function JoinForm({ onSuccess }: JoinFormProps) {
     }
 
     // Set bot name - use custom name or configured default
-    request.bot_name = botName.trim() || config?.defaultBotName || "Vexa - Open Source Bot";
+    request.bot_name = botName.trim() || config?.defaultBotName || "Eggsplain Meet - Bot";
 
     if (language && language !== "auto") {
       request.language = language;

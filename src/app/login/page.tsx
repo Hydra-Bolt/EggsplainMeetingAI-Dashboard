@@ -81,7 +81,7 @@ export default function LoginPage() {
     if (result.success) {
       if (result.mode === "direct") {
         // Direct login mode - user is authenticated, redirect to dashboard
-        toast.success(result.isNewUser ? "Account created! Welcome to Vexa." : "Welcome back!");
+        toast.success(result.isNewUser ? "Account created! Welcome to Eggsplain Meet." : "Welcome back!");
         router.push("/");
       } else {
         // Magic link mode - show "check your email" screen
@@ -330,7 +330,7 @@ export default function LoginPage() {
         </Card>
 
         <p className="text-center text-xs text-muted-foreground mt-6">
-          Vexa Dashboard - Open Source Meeting Transcription
+          Eggsplain Meet Dashboard - Open Source Meeting Transcription
         </p>
       </div>
     </div>
