@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 import { TranscriptSegment } from "@/components/transcript/transcript-segment";
-import { useeggsplainWebSocket } from "@/hooks/use-eggsplain-websocket";
+import { useEggsplainWebSocket } from "@/hooks/use-eggsplain-websocket";
 import { useLiveStore } from "@/stores/live-store";
 import { eggsplainAPI } from "@/lib/api";
 import type { Platform } from "@/types/eggsplain";
@@ -30,7 +30,7 @@ export function LiveSession({ platform, nativeId, onEnd }: LiveSessionProps) {
     clearLiveSession,
   } = useLiveStore();
 
-  const { isConnecting, isConnected, error } = useeggsplainWebSocket({
+  const { isConnecting, isConnected, error } = useEggsplainWebSocket({
     platform,
     nativeId,
     autoConnect: true,

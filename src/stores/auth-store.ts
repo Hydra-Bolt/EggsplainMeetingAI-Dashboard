@@ -1,27 +1,27 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { eggsplainUser } from "@/types/eggsplain";
+import type { EggsplainUser } from "@/types/eggsplain";
 
 interface LoginResult {
   success: boolean;
   error?: string;
   mode?: "direct" | "magic-link";
-  user?: eggsplainUser;
+  user?: EggsplainUser;
   token?: string;
   isNewUser?: boolean;
 }
 
 interface AuthState {
-  user: eggsplainUser | null;
+  user: EggsplainUser | null;
   token: string | null;
   isLoading: boolean;
   isAuthenticated: boolean;
 
   // Actions
   sendMagicLink: (email: string) => Promise<LoginResult>;
-  setAuth: (user: eggsplainUser, token: string) => void;
+  setAuth: (user: EggsplainUser, token: string) => void;
   logout: () => void;
-  setUser: (user: eggsplainUser | null) => void;
+  setUser: (user: EggsplainUser | null) => void;
   setToken: (token: string | null) => void;
   checkAuth: () => Promise<void>;
 
@@ -84,7 +84,7 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      setAuth: (user: eggsplainUser, token: string) => {
+      setAuth: (user: EggsplainUser, token: string) => {
         set({
           user,
           token,

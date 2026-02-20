@@ -7,14 +7,14 @@ import type {
   RecordingData,
 } from "@/types/eggsplain";
 
-class eggsplainAPIError extends Error {
+class EggsplainAPIError extends Error {
   constructor(
     message: string,
     public status: number,
     public details?: unknown
   ) {
     super(message);
-    this.name = "eggsplainAPIError";
+    this.name = "EggsplainAPIError";
   }
 }
 
@@ -49,7 +49,7 @@ async function handleResponse<T>(response: Response): Promise<T> {
       }
     }
 
-    throw new eggsplainAPIError(errorMessage, response.status, details);
+    throw new EggsplainAPIError(errorMessage, response.status, details);
   }
   return response.json();
 }
@@ -213,7 +213,7 @@ export const eggsplainAPI = {
       method: "DELETE",
     });
     if (!response.ok) {
-      throw new eggsplainAPIError(
+      throw new EggsplainAPIError(
         "Failed to stop bot",
         response.status,
         await response.text()
@@ -242,7 +242,7 @@ export const eggsplainAPI = {
       } catch {
         if (errorText) message = errorText;
       }
-      throw new eggsplainAPIError(message, response.status, errorText);
+      throw new EggsplainAPIError(message, response.status, errorText);
     }
   },
 
@@ -299,7 +299,7 @@ export const eggsplainAPI = {
       } catch {
         if (errorText) message = errorText;
       }
-      throw new eggsplainAPIError(message, response.status, errorText);
+      throw new EggsplainAPIError(message, response.status, errorText);
     }
   },
 
@@ -331,4 +331,4 @@ export const eggsplainAPI = {
   },
 };
 
-export { eggsplainAPIError };
+export { EggsplainAPIError };

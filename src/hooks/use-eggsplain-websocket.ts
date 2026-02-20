@@ -10,7 +10,7 @@ import type {
 import { useLiveStore } from "@/stores/live-store";
 import { eggsplainAPI } from "@/lib/api";
 
-interface UseeggsplainWebSocketOptions {
+interface UseEggsplainWebSocketOptions {
   platform: Platform;
   nativeId: string;
   onTranscript?: (segment: TranscriptSegment) => void;
@@ -19,7 +19,7 @@ interface UseeggsplainWebSocketOptions {
   autoConnect?: boolean;
 }
 
-interface UseeggsplainWebSocketReturn {
+interface UseEggsplainWebSocketReturn {
   isConnecting: boolean;
   isConnected: boolean;
   error: string | null;
@@ -56,9 +56,9 @@ function buildWsUrl(baseUrl: string, authToken: string | null): string {
   return `${baseUrl}${separator}api_key=${encodeURIComponent(authToken)}`;
 }
 
-export function useeggsplainWebSocket(
-  options: UseeggsplainWebSocketOptions
-): UseeggsplainWebSocketReturn {
+export function useEggsplainWebSocket(
+  options: UseEggsplainWebSocketOptions
+): UseEggsplainWebSocketReturn {
   const { platform, nativeId, onTranscript, onStatusChange, onError, autoConnect = true } = options;
 
   const wsRef = useRef<WebSocket | null>(null);
@@ -100,7 +100,7 @@ export function useeggsplainWebSocket(
 
         switch (message.type) {
           case "transcript.mutable":
-            // Process all segments from the payload (eggsplain sends segments array)
+            // Process all segments from the payload (Eggsplain sends segments array)
             if (message.payload?.segments) {
               for (const seg of message.payload.segments) {
                 // Skip empty segments or those missing required fields
@@ -162,15 +162,15 @@ export function useeggsplainWebSocket(
     if (bootstrappedRef.current) return;
 
     try {
-      console.log(`[eggsplainWebSocket] Bootstrapping transcripts from REST API: ${platform}/${nativeId}`);
+      console.log(`[EggsplainWebSocket] Bootstrapping transcripts from REST API: ${platform}/${nativeId}`);
       const segments = await eggsplainAPI.getTranscripts(platform, nativeId);
-      console.log(`[eggsplainWebSocket] Bootstrapped ${segments.length} segments from REST API`);
+      console.log(`[EggsplainWebSocket] Bootstrapped ${segments.length} segments from REST API`);
       
       // Bootstrap the live transcripts store
       bootstrapLiveTranscripts(segments);
       bootstrappedRef.current = true;
     } catch (error) {
-      console.error("[eggsplainWebSocket] Bootstrap from REST API failed:", error);
+      console.error("[EggsplainWebSocket] Bootstrap from REST API failed:", error);
       // Continue anyway - WebSocket will provide segments
       bootstrappedRef.current = true;
     }

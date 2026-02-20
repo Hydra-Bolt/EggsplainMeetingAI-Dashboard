@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import type { Meeting, TranscriptSegment, Platform, MeetingStatus, RecordingData, ChatMessage } from "@/types/eggsplain";
-import { eggsplainAPIError, eggsplainAPI } from "@/lib/api";
+import { EggsplainAPIError, eggsplainAPI } from "@/lib/api";
 import { deduplicateOverlappingSegments } from "@/lib/transcript-dedup";
 
 interface MeetingDataUpdate {
@@ -396,7 +396,7 @@ export const useMeetingsStore = create<MeetingsState>((set, get) => ({
       const result = await eggsplainAPI.getChatMessages(platform, nativeId);
       set({ chatMessages: result.messages });
     } catch (error) {
-      if (error instanceof eggsplainAPIError && error.status === 404) {
+      if (error instanceof EggsplainAPIError && error.status === 404) {
         // Backward compatibility: older backends do not expose this endpoint.
         const isMissingRoute = error.message === "Not Found";
         if (isMissingRoute) {

@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import { adminAPI } from "@/lib/admin-api";
 import type {
-  eggsplainUser,
-  eggsplainUserWithTokens,
+  EggsplainUser,
+  EggsplainUserWithTokens,
   CreateUserRequest,
   UpdateUserRequest,
   CreateTokenResponse,
@@ -10,8 +10,8 @@ import type {
 
 interface AdminState {
   // Data
-  users: eggsplainUser[];
-  selectedUser: eggsplainUserWithTokens | null;
+  users: EggsplainUser[];
+  selectedUser: EggsplainUserWithTokens | null;
 
   // Loading states
   isLoadingUsers: boolean;
@@ -28,7 +28,7 @@ interface AdminState {
   // Actions
   fetchUsers: () => Promise<void>;
   fetchUser: (userId: string) => Promise<void>;
-  createUser: (data: CreateUserRequest) => Promise<eggsplainUser | null>;
+  createUser: (data: CreateUserRequest) => Promise<EggsplainUser | null>;
   updateUser: (userId: string, data: UpdateUserRequest) => Promise<void>;
   createToken: (userId: string) => Promise<CreateTokenResponse | null>;
   revokeToken: (tokenId: string) => Promise<void>;

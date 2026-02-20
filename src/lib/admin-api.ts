@@ -1,6 +1,6 @@
 import type {
-  eggsplainUser,
-  eggsplainUserWithTokens,
+  EggsplainUser,
+  EggsplainUserWithTokens,
   CreateUserRequest,
   UpdateUserRequest,
   CreateTokenResponse,
@@ -37,39 +37,39 @@ export const adminAPI = {
   // Users
   // ==========================================
 
-  async getUsers(skip = 0, limit = 100): Promise<eggsplainUser[]> {
+  async getUsers(skip = 0, limit = 100): Promise<EggsplainUser[]> {
     const response = await fetch(`/api/admin/users?skip=${skip}&limit=${limit}`);
-    const data = await handleResponse<eggsplainUser[] | { users: eggsplainUser[] }>(response);
+    const data = await handleResponse<EggsplainUser[] | { users: EggsplainUser[] }>(response);
     // Handle both array and object responses
     return Array.isArray(data) ? data : data.users || [];
   },
 
-  async getUser(userId: string): Promise<eggsplainUserWithTokens> {
+  async getUser(userId: string): Promise<EggsplainUserWithTokens> {
     const response = await fetch(`/api/admin/users/${userId}`);
-    return handleResponse<eggsplainUserWithTokens>(response);
+    return handleResponse<EggsplainUserWithTokens>(response);
   },
 
-  async getUserByEmail(email: string): Promise<eggsplainUser> {
+  async getUserByEmail(email: string): Promise<EggsplainUser> {
     const response = await fetch(`/api/admin/users/email/${encodeURIComponent(email)}`);
-    return handleResponse<eggsplainUser>(response);
+    return handleResponse<EggsplainUser>(response);
   },
 
-  async createUser(data: CreateUserRequest): Promise<eggsplainUser> {
+  async createUser(data: CreateUserRequest): Promise<EggsplainUser> {
     const response = await fetch("/api/admin/users", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
-    return handleResponse<eggsplainUser>(response);
+    return handleResponse<EggsplainUser>(response);
   },
 
-  async updateUser(userId: string, data: UpdateUserRequest): Promise<eggsplainUser> {
+  async updateUser(userId: string, data: UpdateUserRequest): Promise<EggsplainUser> {
     const response = await fetch(`/api/admin/users/${userId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
-    return handleResponse<eggsplainUser>(response);
+    return handleResponse<EggsplainUser>(response);
   },
 
   // ==========================================

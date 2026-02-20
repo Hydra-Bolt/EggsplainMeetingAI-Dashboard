@@ -114,7 +114,7 @@ async function adminRequest<T>(
   options: RequestInit = {},
   timeout = DEFAULT_TIMEOUT
 ): Promise<ApiResult<T>> {
-  const API_URL = process.env.API_URL || process.env.API_URL || "http://localhost:18056";
+  const API_URL = process.env.API_URL || "http://localhost:18056";
   const ADMIN_API_KEY = process.env.ADMIN_API_KEY || "";
 
   if (!ADMIN_API_KEY || ADMIN_API_KEY === "your_admin_api_key_here") {
