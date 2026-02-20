@@ -5,7 +5,7 @@ services:
     build:
       context: .
     ports:
-      - "3000:3000"
+      - "6000:3000"
     environment:
       # Eggsplain Meet API Connection (runtime configuration)
       - VEXA_API_URL=${VEXA_API_URL:-http://eggsplain-api:18056}
