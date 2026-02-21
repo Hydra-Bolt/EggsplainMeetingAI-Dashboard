@@ -862,7 +862,7 @@ export default function MeetingDetailPage() {
                     </DropdownMenuTrigger>
                   </div>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => handleOpenInProvider("chatgpt")}>
+                  {/* <DropdownMenuItem onClick={() => handleOpenInProvider("chatgpt")}>
                     <Image src="/icons/icons8-chatgpt-100.png" alt="ChatGPT" width={16} height={16} className="object-contain mr-2 invert dark:invert-0" />
                     Open in ChatGPT
                   </DropdownMenuItem>
@@ -870,7 +870,7 @@ export default function MeetingDetailPage() {
                     <Image src="/icons/icons8-perplexity-ai-100.png" alt="Perplexity" width={16} height={16} className="object-contain mr-2" />
                     Open in Perplexity
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator />
+                  <DropdownMenuSeparator /> */}
                   <DropdownMenuItem asChild>
                     <Link href="/docs/cookbook/share-transcript-url" target="_blank" rel="noopener noreferrer" className="flex items-center">
                       <ExternalLink className="h-4 w-4 mr-2" />
@@ -1107,7 +1107,7 @@ export default function MeetingDetailPage() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => handleOpenInProvider("chatgpt")} disabled={transcripts.length === 0}>
+                    {/* <DropdownMenuItem onClick={() => handleOpenInProvider("chatgpt")} disabled={transcripts.length === 0}>
                       <Image src="/icons/icons8-chatgpt-100.png" alt="ChatGPT" width={16} height={16} className="object-contain mr-2 invert dark:invert-0" />
                       Open in ChatGPT
                     </DropdownMenuItem>
@@ -1115,7 +1115,7 @@ export default function MeetingDetailPage() {
                       <Image src="/icons/icons8-perplexity-ai-100.png" alt="Perplexity" width={16} height={16} className="object-contain mr-2" />
                       Open in Perplexity
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator />
+                    <DropdownMenuSeparator /> */}
                     <DropdownMenuItem
                       onClick={() => {
                         if (!isChatgptPromptExpanded) {
