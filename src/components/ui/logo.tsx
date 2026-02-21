@@ -33,7 +33,7 @@ export function Logo({ className, size = "md", showText = false }: LogoProps) {
 
   // Determine which logo to use based on theme
   // Use dark logo in light mode, light logo in dark mode (inverse)
-  const logoSrc = "/icons/logo.png";
+  const logoSrc = "/icons/icon.jpg";
 
   if (!mounted) {
     // Return a placeholder while theme is being determined
