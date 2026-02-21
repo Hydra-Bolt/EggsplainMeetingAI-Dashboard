@@ -33,7 +33,7 @@ interface SidebarProps {
 const navigation = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
   { name: "Meetings", href: "/meetings", icon: Video },
-  { name: "Tracker", href: "/tracker", icon: Zap },
+  // { name: "Tracker", href: "/tracker", icon: Zap },
 ];
 
 const adminNavigation = [
