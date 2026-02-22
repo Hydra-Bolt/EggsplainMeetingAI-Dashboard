@@ -17,7 +17,7 @@ type LoginState = "email" | "sent";
 
 interface HealthStatus {
   status: "ok" | "degraded" | "error";
-  authMode: "direct" | "magic-link" | "google";
+  authMode: "direct" | "magic-link" | "google" | "password";
   checks: {
     smtp: { configured: boolean; optional?: boolean; error?: string };
     googleOAuth: { configured: boolean; optional?: boolean; error?: string };
@@ -29,8 +29,9 @@ interface HealthStatus {
 
 export default function LoginPage() {
   const router = useRouter();
-  const { sendMagicLink, isLoading, isAuthenticated } = useAuthStore();
+  const { sendMagicLink, loginWithPassword, isLoading, isAuthenticated } = useAuthStore();
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [state, setState] = useState<LoginState>("email");
   const [healthStatus, setHealthStatus] = useState<HealthStatus | null>(null);
   const [healthLoading, setHealthLoading] = useState(true);
@@ -73,6 +74,22 @@ export default function LoginPage() {
 
     if (!email) {
       toast.error("Please enter your email");
+      return;
+    }
+
+    if (healthStatus?.authMode === "password") {
+      if (!password) {
+        toast.error("Please enter your password");
+        return;
+      }
+
+      const result = await loginWithPassword(email, password);
+      if (result.success) {
+        toast.success("Welcome!");
+        router.push("/");
+      } else {
+        toast.error(result.error || "Login failed");
+      }
       return;
     }
 
@@ -122,8 +139,9 @@ export default function LoginPage() {
   const isConfigError = healthStatus?.status === "error";
   const hasWarnings = healthStatus?.status === "degraded";
   const isDirectMode = healthStatus?.authMode === "direct";
+  const isPasswordMode = healthStatus?.authMode === "password";
   const isGoogleAuthEnabled = healthStatus?.checks.googleOAuth.configured === true;
-  const isEmailAuthEnabled = !isGoogleAuthEnabled && (healthStatus?.authMode === "magic-link" || healthStatus?.authMode === "direct");
+  const isEmailAuthEnabled = !isGoogleAuthEnabled && (healthStatus?.authMode === "magic-link" || healthStatus?.authMode === "direct" || healthStatus?.authMode === "password");
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted/30 p-4">
@@ -182,6 +200,8 @@ export default function LoginPage() {
                 <CardDescription>
                   {isGoogleAuthEnabled
                     ? "Sign in to continue"
+                    : isPasswordMode
+                    ? "Enter your email and password to sign in"
                     : isDirectMode
                     ? "Enter your email to sign in"
                     : "Enter your email to receive a sign-in link"}
@@ -251,6 +271,20 @@ export default function LoginPage() {
                       </div>
                     </div>
 
+                    {isPasswordMode && (
+                      <div className="space-y-2">
+                        <Label htmlFor="password">Password</Label>
+                        <Input
+                          id="password"
+                          type="password"
+                          placeholder="••••••••"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          disabled={isLoading || isConfigError}
+                        />
+                      </div>
+                    )}
+
                     <Button
                       type="submit"
                       className="w-full"
@@ -269,6 +303,8 @@ export default function LoginPage() {
                         </>
                       ) : isConfigError ? (
                         "Server Unavailable"
+                      ) : isPasswordMode ? (
+                        "Sign In"
                       ) : isDirectMode ? (
                         "Sign In"
                       ) : (

@@ -13,6 +13,8 @@ services:
       # Admin API (required for authentication)
       - ADMIN_API_KEY=${ADMIN_API_KEY}
       - ADMIN_API_URL=${ADMIN_API_URL:-}
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-}
 
       # SMTP Configuration
       - SMTP_HOST=${SMTP_HOST}

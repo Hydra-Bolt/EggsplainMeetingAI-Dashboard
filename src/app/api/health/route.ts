@@ -5,10 +5,11 @@ export const dynamic = "force-dynamic";
 
 interface HealthStatus {
   status: "ok" | "degraded" | "error";
-  authMode: "direct" | "magic-link" | "google";
+  authMode: "direct" | "magic-link" | "google" | "password";
   checks: {
     smtp: { configured: boolean; optional: boolean; error?: string };
     googleOAuth: { configured: boolean; optional: boolean; error?: string };
+    passwordAuth: { configured: boolean; optional: boolean; error?: string };
     adminApi: { configured: boolean; reachable: boolean; error?: string };
     eggsplainApi: { configured: boolean; reachable: boolean; error?: string };
   };
@@ -25,6 +26,7 @@ export async function GET() {
     checks: {
       smtp: { configured: false, optional: true },
       googleOAuth: { configured: false, optional: true },
+      passwordAuth: { configured: false, optional: true },
       adminApi: { configured: false, reachable: false },
       eggsplainApi: { configured: false, reachable: false },
     },
@@ -66,6 +68,20 @@ export async function GET() {
   } else {
     // SMTP is optional - direct login mode will be used if no other auth is configured
     status.checks.smtp.error = "SMTP not configured";
+  }
+
+  // Check Password configuration (optional - enables password auth)
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+
+  if (adminEmail && adminPassword) {
+    status.checks.passwordAuth.configured = true;
+    // Set to password if Google OAuth and SMTP are not configured
+    if (!status.checks.googleOAuth.configured && !status.checks.smtp.configured) {
+      status.authMode = "password";
+    }
+  } else {
+    status.checks.passwordAuth.error = "Admin email and password not configured";
   }
 
   // Check Admin API configuration
