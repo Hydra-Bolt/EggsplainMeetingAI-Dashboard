@@ -26,6 +26,7 @@ import {
   ExternalLink,
   Trash2,
   Zap,
+  Settings2Icon,
 } from "lucide-react";
 import { AudioPlayer, type AudioPlayerHandle, type AudioFragment } from "@/components/recording/audio-player";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -839,17 +840,10 @@ export default function MeetingDetailPage() {
                     <Button
                       variant="ghost"
                       className="gap-2 rounded-r-none border-r-0 hover:bg-muted h-full"
-                      onClick={handleSendToChatGPT}
-                      title="Connect AI"
+                      title="Configure"
                     >
-                      <Image
-                        src="/icons/icons8-chatgpt-100.png"
-                        alt="AI"
-                        width={18}
-                        height={18}
-                        className="object-contain invert dark:invert-0"
-                      />
-                      <span>Connect AI</span>
+                      <Settings2Icon/>
+                      <span>Configure</span>
                     </Button>
                     <DropdownMenuTrigger asChild>
                       <Button
